@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 1 — Something in the Air | Human Physiology</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #185FA5; --blue-light: #E6F1FB; --blue-mid: #378ADD; --blue-dark: #0C447C;
+    --teal: #1D9E75; --teal-light: #E1F5EE; --teal-dark: #0F6E56;
+    --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #854F0B;
+    --red: #A32D2D; --red-light: #FCEBEB;
+    --purple: #534AB7; --purple-light: #EEEDFE;
+    --gray-bg: #f8f7f4; --gray-border: #e2e0d8;
+    --text-primary: #1a1917; --text-secondary: #5F5E5A;
+    --radius-md: 8px; --radius-lg: 12px;
+  }
+  body { font-family: Georgia, serif; background: var(--gray-bg); color: var(--text-primary); line-height: 1.7; min-height: 100vh; }
+
+  .page-header { background: var(--blue-dark); color: white; padding: 2rem 1.5rem 1.5rem; text-align: center; }
+  .page-header .course-label { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
+  .page-header h1 { font-size: 28px; font-weight: normal; font-style: italic; margin-bottom: 6px; }
+  .page-header .tagline { font-family: Arial, sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-label { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 8px; }
+  .progress-bar { display: flex; gap: 5px; }
+  .prog-seg { flex: 1; height: 5px; border-radius: 3px; background: var(--gray-border); transition: background 0.4s; }
+  .prog-seg.done { background: var(--teal); }
+  .prog-seg.active { background: var(--blue-mid); }
+
+  .phase { display: none; }
+  .phase.active { display: block; }
+
+  .phase-heading { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-secondary); border-bottom: 0.5px solid var(--gray-border); padding-bottom: 8px; margin-bottom: 1.5rem; }
+
+  .scene-card { background: white; border-radius: 0 var(--radius-lg) var(--radius-lg) 0; border: 1px solid var(--gray-border); border-left: 4px solid var(--blue-mid); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+  .scene-card.warn { border-left-color: var(--amber); }
+  .scene-card.alert { border-left-color: var(--red); }
+  .scene-card.ok { border-left-color: var(--teal); }
+  .scene-label { font-family: Arial, sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 8px; }
+  .scene-text { font-size: 15px; line-height: 1.75; }
+
+  .dialogue { background: #fafaf8; border: 1px solid var(--gray-border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .dialogue-speaker { font-family: Arial, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); margin-bottom: 6px; }
+  .dialogue-text { font-size: 15px; font-style: italic; line-height: 1.65; }
+
+  .vitals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .vital-card { background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 0.75rem 1rem; }
+  .vital-label { font-family: Arial, sans-serif; font-size: 10px; color: var(--text-secondary); margin-bottom: 4px; }
+  .vital-value { font-size: 20px; font-family: Arial, sans-serif; font-weight: bold; color: var(--text-primary); }
+  .vital-note { font-family: Arial, sans-serif; font-size: 10px; color: var(--amber); margin-top: 2px; }
+
+  .question-block { background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+  .q-tag { display: inline-block; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; border-radius: 4px; padding: 3px 9px; margin-bottom: 10px; }
+  .tag-mc { background: var(--blue-light); color: var(--blue-dark); }
+  .tag-tf { background: var(--teal-light); color: var(--teal-dark); }
+  .tag-ma { background: var(--amber-light); color: var(--amber-dark); }
+
+  .q-text { font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; line-height: 1.6; margin-bottom: 1rem; }
+
+  .option-btn { display: block; width: 100%; text-align: left; background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 8px; font-size: 14px; font-family: Arial, sans-serif; color: var(--text-primary); cursor: pointer; line-height: 1.5; transition: border-color 0.15s, background 0.15s; }
+  .option-btn:hover:not([disabled]) { background: var(--gray-bg); border-color: #b4b2a9; }
+  .option-btn.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); }
+  .option-btn.incorrect { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .option-btn.multi-selected { border-color: var(--amber); background: var(--amber-light); color: var(--amber-dark); }
+
+  .tf-wrap { display: flex; gap: 10px; }
+  .tf-btn { flex: 1; text-align: center; background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 11px; font-size: 14px; font-family: Arial, sans-serif; color: var(--text-primary); cursor: pointer; transition: all 0.15s; }
+  .tf-btn:hover:not([disabled]) { background: var(--gray-bg); }
+  .tf-btn.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); }
+  .tf-btn.incorrect { border-color: var(--red); background: var(--red-light); color: var(--red); }
+
+  .feedback { margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-md); font-size: 14px; font-family: Arial, sans-serif; line-height: 1.6; display: none; }
+  .feedback.show-correct { display: block; background: var(--teal-light); color: var(--teal-dark); }
+  .feedback.show-incorrect { display: block; background: var(--red-light); color: var(--red); }
+  .feedback.show-partial { display: block; background: var(--amber-light); color: var(--amber-dark); }
+
+  .check-btn { background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 9px 18px; font-size: 13px; font-family: Arial, sans-serif; color: var(--text-secondary); cursor: pointer; margin-top: 8px; transition: all 0.15s; }
+  .check-btn:hover { background: var(--gray-bg); color: var(--text-primary); }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--gray-border); }
+  .nav-btn { background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 10px 24px; font-size: 14px; font-family: Arial, sans-serif; color: var(--text-primary); cursor: pointer; transition: all 0.15s; }
+  .nav-btn:hover:not([disabled]) { background: var(--gray-bg); }
+  .nav-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
+  .nav-btn.primary:hover { background: var(--blue-dark); }
+
+  /* SUMMARY PAGE */
+  .summary-header { background: var(--blue-dark); color: white; border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+  .summary-header h2 { font-size: 22px; font-weight: normal; font-style: italic; margin-bottom: 4px; }
+  .summary-header p { font-family: Arial, sans-serif; font-size: 13px; color: rgba(255,255,255,0.75); }
+
+  .score-banner { display: flex; align-items: center; justify-content: center; gap: 2rem; background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .score-block { text-align: center; }
+  .score-big { font-size: 52px; font-family: Arial, sans-serif; font-weight: bold; line-height: 1; }
+  .score-big.pass { color: var(--teal); }
+  .score-big.fail { color: var(--red); }
+  .score-label { font-family: Arial, sans-serif; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 4px; }
+  .score-divider { width: 1px; height: 60px; background: var(--gray-border); }
+  .score-pct { font-size: 28px; font-family: Arial, sans-serif; font-weight: bold; }
+
+  .stamp-block { border: 2px solid var(--teal); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; text-align: center; margin-bottom: 1.5rem; background: var(--teal-light); }
+  .stamp-label { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal-dark); margin-bottom: 6px; }
+  .stamp-name { font-size: 22px; color: var(--teal-dark); margin-bottom: 4px; }
+  .stamp-date { font-family: Arial, sans-serif; font-size: 13px; color: var(--teal-dark); }
+
+  .name-input-row { background: white; border: 1px solid var(--gray-border); border-radius: var(--radius-lg); padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+  .name-input-row label { font-family: Arial, sans-serif; font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+  .name-input-row input { width: 100%; border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 9px 12px; font-size: 15px; font-family: Georgia, serif; color: var(--text-primary); background: white; }
+  .name-input-row input:focus { outline: none; border-color: var(--blue-mid); }
+
+  .submit-instructions { background: var(--amber-light); border: 1px solid var(--amber); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; font-family: Arial, sans-serif; font-size: 14px; color: var(--amber-dark); line-height: 1.7; }
+
+  .summary-section { margin-bottom: 1.75rem; }
+  .summary-section-title { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-secondary); border-bottom: 0.5px solid var(--gray-border); padding-bottom: 6px; margin-bottom: 1rem; }
+
+  .summary-q-block { border: 1px solid var(--gray-border); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 10px; background: white; }
+  .summary-q-block.sq-correct { border-left: 4px solid var(--teal); }
+  .summary-q-block.sq-incorrect { border-left: 4px solid var(--red); }
+  .sq-label { font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+  .sq-label.correct { color: var(--teal-dark); }
+  .sq-label.incorrect { color: var(--red); }
+  .sq-question { font-family: Arial, sans-serif; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.5; }
+  .sq-answer { font-family: Arial, sans-serif; font-size: 14px; margin-bottom: 4px; }
+  .sq-answer.your { color: var(--text-primary); }
+  .sq-answer.their { color: var(--red); }
+  .sq-answer.right { color: var(--teal-dark); }
+  .sq-explanation { font-family: Arial, sans-serif; font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 8px; border-top: 0.5px solid var(--gray-border); padding-top: 8px; }
+
+  .locked-notice { background: var(--red-light); border: 1px solid var(--red); border-radius: var(--radius-md); padding: 10px 14px; font-family: Arial, sans-serif; font-size: 13px; color: var(--red); text-align: center; margin-bottom: 1.5rem; }
+
+  @media print {
+    .page-header, .progress-wrap, .nav-row, .submit-instructions, .name-input-row, .locked-notice { display: none !important; }
+    .phase { display: none !important; }
+    #phase-5 { display: block !important; }
+    body { background: white; }
+    .summary-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .stamp-block { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Human Physiology — Undergraduate Nursing | Case Study 1 of 5</div>
+  <h1>Something in the Air</h1>
+  <div class="tagline">A school nurse investigates a mysterious illness outbreak at Maplewood School</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your progress</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 0 -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">Phase 1 of 5 &nbsp;—&nbsp; The nurse's office, 9:15 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">Setting the scene</div>
+      <div class="scene-text">It is a cold Tuesday morning in February. The windows at Maplewood School have been sealed shut since last week due to freezing temperatures. You are the school nurse. By 9:15 AM, three 7th-grade students have come to your office within 30 minutes of each other — all complaining of headaches and feeling "off." One says she feels slightly dizzy. There is a big science test scheduled for 3rd period today.</div>
+    </div>
+    <div class="dialogue"><div class="dialogue-speaker">Student 1 — Jaylen, age 12</div><div class="dialogue-text">"My head is pounding. I don't feel good. I really don't want to go back to class."</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Student 2 — Priya, age 13</div><div class="dialogue-text">"I feel kind of dizzy and a little nauseous. It started when I was sitting in homeroom."</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Student 3 — Marcus, age 12</div><div class="dialogue-text">"I have a really bad headache. My eyes feel weird. Can I just lie down?"</div></div>
+    <div class="scene-card warn" style="margin-top:1.25rem;">
+      <div class="scene-label">Your observations</div>
+      <div class="scene-text">All three students appear alert but uncomfortable. No fever in any of them. No rashes, no vomiting. Skin color looks normal at first glance. Onset of symptoms in all three was within the last hour, in the same classroom.</div>
+    </div>
+    <div class="vitals-grid">
+      <div class="vital-card"><div class="vital-label">Jaylen — Heart Rate</div><div class="vital-value">92 bpm</div><div class="vital-note">slightly elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Jaylen — Resp. Rate</div><div class="vital-value">18/min</div></div>
+      <div class="vital-card"><div class="vital-label">Priya — Heart Rate</div><div class="vital-value">88 bpm</div><div class="vital-note">slightly elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Priya — Resp. Rate</div><div class="vital-value">17/min</div></div>
+      <div class="vital-card"><div class="vital-label">Marcus — Heart Rate</div><div class="vital-value">94 bpm</div><div class="vital-note">slightly elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Marcus — Resp. Rate</div><div class="vital-value">19/min</div></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q1. Three students from the same classroom present with headaches, dizziness, and nausea within 30 minutes of each other. No fever, no rash. What does this pattern most strongly suggest?</div>
+      <button class="option-btn" onclick="selectMC(this,'q1','A',false)">A. A viral respiratory infection spreading through the class</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','B',false)">B. Anxiety or psychosomatic illness related to the upcoming test</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','C',true)">C. A shared environmental exposure affecting multiple students simultaneously</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','D',false)">D. Dehydration from not drinking enough water that morning</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q2. The absence of fever in all three students makes a bacterial or viral infection the most likely explanation for their symptoms.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q2','True',false)">True</button>
+        <button class="tf-btn" onclick="selectTF(this,'q2','False',true)">False</button>
+      </div>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q3. All three students have slightly elevated heart rates but normal respiratory rates. Physiologically, why might the heart rate increase when oxygen delivery to tissues is reduced?</div>
+      <button class="option-btn" onclick="selectMC(this,'q3','A',false)">A. The lungs produce more CO₂ to compensate for oxygen loss, stimulating the heart</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','B',true)">B. The heart beats faster to push more blood to oxygen-starved tissues — a compensatory homeostatic response</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','C',false)">C. Stress hormones slow blood flow, which reflexively triggers a heart rate increase</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','D',false)">D. Elevated heart rate is a direct response to headache pain, unrelated to oxygenation</button>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" onclick="goPhase(1)">Next: A teacher weighs in &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Phase 2 of 5 &nbsp;—&nbsp; The hallway, 9:40 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">A new voice</div>
+      <div class="scene-text">You step out to find Ms. Garvey, a 7th-grade science teacher, waiting in the hallway. She looks more irritated than worried. By now two more students have arrived — a total of five middle schoolers from two different classrooms.</div>
+    </div>
+    <div class="dialogue"><div class="dialogue-speaker">Ms. Garvey — 7th grade science teacher</div><div class="dialogue-text">"I have to be honest with you — today is a big test day. This happens every single time. Kids start feeling 'sick' right before a major exam. I've been teaching here for eleven years. I know what test anxiety looks like. Can you just send them back to class?"</div></div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q4. As the school nurse, you should accept Ms. Garvey's test anxiety explanation and send the students back to class.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q4','True',false)">True</button>
+        <button class="tf-btn" onclick="selectTF(this,'q4','False',true)">False</button>
+      </div>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q5. Which features of this situation most strongly argue AGAINST test anxiety as the sole explanation? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q5')">A. Students from two different classrooms are affected</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q5')">B. All students have measurable physical signs including elevated heart rate</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q5')">C. All five students are in the same grade level</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q5')">D. Symptom onset is tightly clustered within the same 30-minute window</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q5')">E. No student has a fever</button>
+      <button class="check-btn" onclick="checkMA('q5',['A','B','D'])">Check my answers</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+    <div class="scene-card warn" style="margin-top:1rem;">
+      <div class="scene-label">10:05 AM — a phone call</div>
+      <div class="scene-text">The elementary PE teacher calls the nurse's office while you are still speaking with Ms. Garvey.</div>
+    </div>
+    <div class="dialogue"><div class="dialogue-speaker">Mr. Deluca — Elementary school PE teacher</div><div class="dialogue-text">"Hey, I'm not sure if this is anything, but it's the weirdest thing. We were doing the parachute game today — you know how the kids go absolutely crazy for it — and half of them just didn't want to play. A few sat down on their own. One girl said her head hurt. Another said she felt tired. These are 2nd graders. They live for parachute day. I just thought you should know."</div></div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q6. Mr. Deluca's report involves younger children in a different part of the building showing similar symptoms. Physiologically, why would young children show symptoms of an airborne environmental exposure more quickly than older students?</div>
+      <button class="option-btn" onclick="selectMC(this,'q6','A',false)">A. Children are more emotionally sensitive and therefore quicker to report discomfort</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','B',true)">B. Children have higher metabolic and respiratory rates, so they inhale more air — and any airborne toxin — relative to their body weight</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','C',false)">C. Children's immune systems are weaker, making them more susceptible to any illness</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','D',false)">D. The elementary wing is physically older and has different air quality, unrelated to physiology</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q7. You now have students affected in multiple locations across the building — both middle school classrooms and the elementary gym. What does this pattern tell you about the likely source of the problem?</div>
+      <button class="option-btn" onclick="selectMC(this,'q7','A',false)">A. It confirms a contagious illness spreading person-to-person through the school</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','B',false)">B. It suggests the cafeteria food is the likely cause since all students share the same kitchen</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','C',true)">C. It points to a building-wide environmental source affecting the shared air supply</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','D',false)">D. It suggests psychogenic illness spreading socially from older to younger students</button>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(0)">Back</button>
+      <button class="nav-btn primary" onclick="goPhase(2)">Next: Piecing it together &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="phase-2" class="phase">
+    <div class="phase-heading">Phase 3 of 5 &nbsp;—&nbsp; Reasoning through the physiology</div>
+    <div class="scene-card alert">
+      <div class="scene-label">10:20 AM — forming a hypothesis</div>
+      <div class="scene-text">You now have eight students across two age groups in different parts of the building — all showing the same cluster: headache, dizziness, nausea, fatigue. No fever. No rash. The building has sealed windows and the heating system has been running all night in below-freezing temperatures. You begin to form a clear hypothesis.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q8. Based on the full symptom pattern and environmental context, what is the most likely cause of the outbreak?</div>
+      <button class="option-btn" onclick="selectMC(this,'q8','A',false)">A. A gastrointestinal virus spreading via shared surfaces in the school</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','B',false)">B. Mass psychogenic illness triggered by test-related stress among middle schoolers</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','C',true)">C. Carbon monoxide poisoning from a faulty heating system circulating through the building</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','D',false)">D. An allergic reaction to something served at breakfast in the cafeteria</button>
+      <div class="feedback" id="fb-q8"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q9. Carbon monoxide (CO) causes cellular harm by interfering with oxygen transport. Which of the following accurately describe how CO affects the body? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q9')">A. CO binds to hemoglobin with far greater affinity than oxygen does</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q9')">B. CO directly destroys red blood cells, reducing oxygen-carrying capacity</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q9')">C. CO forms carboxyhemoglobin, a molecule that cannot deliver oxygen to tissues</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q9')">D. CO poisoning can occur even while breathing appears completely normal</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q9')">E. The brain is the first organ to show symptoms because of its exceptionally high oxygen demand</button>
+      <button class="check-btn" onclick="checkMA('q9',['A','C','D','E'])">Check my answers</button>
+      <div class="feedback" id="fb-q9"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q10. A person experiencing carbon monoxide poisoning will always show obvious signs such as blue-tinted skin or labored breathing, making the condition easy to identify visually.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q10','True',false)">True</button>
+        <button class="tf-btn" onclick="selectTF(this,'q10','False',true)">False</button>
+      </div>
+      <div class="feedback" id="fb-q10"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q11. Why do neurological symptoms — headache, dizziness, confusion — appear first in carbon monoxide poisoning rather than symptoms in other organ systems?</div>
+      <button class="option-btn" onclick="selectMC(this,'q11','A',true)">A. The brain consumes roughly 20% of the body's oxygen supply despite being only about 2% of body weight, making it the first organ to suffer when oxygen delivery drops</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','B',false)">B. CO specifically targets neurological tissue on a molecular level before affecting any other organ</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','C',false)">C. The brain produces more CO₂ than any other organ, which makes it more chemically reactive to CO</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','D',false)">D. Neurological symptoms appear first because the brain receives its blood supply last in the circulatory sequence</button>
+      <div class="feedback" id="fb-q11"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(1)">Back</button>
+      <button class="nav-btn primary" onclick="goPhase(3)">Next: Making the case &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">Phase 4 of 5 &nbsp;—&nbsp; The principal's office, 10:30 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">An unexpected clue</div>
+      <div class="scene-text">You walk to the main office to speak with Principal Torres. As you wait, the school secretary overhears you and looks up from her desk.</div>
+    </div>
+    <div class="dialogue"><div class="dialogue-speaker">Mrs. Okafor — Principal's secretary</div><div class="dialogue-text">"Oh — wait. Now that I think about it, there were some maintenance workers here on Friday. They were doing something with the boiler in the basement. I don't know exactly what, but they were down there for a few hours. Could that be related to what you're describing?"</div></div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q12. Mrs. Okafor's information about the boiler maintenance is the primary evidence supporting the CO hypothesis — without it, the nurse's case to the principal would not be valid.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q12','True',false)">True</button>
+        <button class="tf-btn" onclick="selectTF(this,'q12','False',true)">False</button>
+      </div>
+      <div class="feedback" id="fb-q12"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q13. You are now presenting your case to Principal Torres. Which of the following pieces of evidence should you include in your argument to justify an immediate evacuation? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q13')">A. Eight students across two age groups and multiple locations share the same symptoms</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q13')">B. Ms. Garvey has 11 years of experience and believes it is test anxiety</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q13')">C. Symptoms include objective physical signs — elevated heart rate — not just subjective complaints</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q13')">D. The building has been sealed with no fresh air circulation and the heater has run overnight</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q13')">E. Boiler maintenance was performed on Friday, raising the possibility of a CO leak</button>
+      <button class="option-btn multi" data-letter="F" onclick="toggleMA(this,'q13')">F. Elementary students refused to participate in a game they normally love — a behavioral sign inconsistent with test anxiety</button>
+      <button class="check-btn" onclick="checkMA('q13',['A','C','D','E','F'])">Check my answers</button>
+      <div class="feedback" id="fb-q13"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q14. Principal Torres asks: "If we evacuate and the kids feel better outside, does that prove it was CO?" What is the most physiologically accurate response?</div>
+      <button class="option-btn" onclick="selectMC(this,'q14','A',false)">A. No — feeling better outside only proves the students were anxious about being in school</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','B',false)">B. No — symptom resolution is irrelevant to diagnosing the cause of an illness</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','C',true)">C. Yes — when the suspected environmental cause is removed and symptoms resolve, that resolution is itself a form of physiological evidence supporting the hypothesis</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','D',false)">D. Yes — because fresh air always cures any illness regardless of its cause</button>
+      <div class="feedback" id="fb-q14"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(2)">Back</button>
+      <button class="nav-btn primary" onclick="goPhase(4)">Next: Resolution &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">Phase 5 of 5 &nbsp;—&nbsp; Resolution and physiological analysis</div>
+    <div class="scene-card ok">
+      <div class="scene-label">11:15 AM — outcome</div>
+      <div class="scene-text">The school has been evacuated. Emergency services arrived and confirmed elevated CO levels traced to an improperly reconnected flue pipe on the boiler after Friday's maintenance. Within 20 minutes outside in fresh air, most students report their headaches fading and energy returning. No students required hospitalization. The nurse's early recognition and decisive action prevented a potentially life-threatening situation.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q15. Once students are outside breathing fresh air, what physiological process drives the reversal of their symptoms?</div>
+      <button class="option-btn" onclick="selectMC(this,'q15','A',false)">A. The immune system produces antibodies that neutralize CO molecules in the bloodstream</button>
+      <button class="option-btn" onclick="selectMC(this,'q15','B',true)">B. Increased O₂ concentration in fresh air competitively displaces CO from hemoglobin, gradually restoring oxyhemoglobin and normal oxygen delivery to tissues</button>
+      <button class="option-btn" onclick="selectMC(this,'q15','C',false)">C. The liver rapidly filters CO out of the bloodstream within a few minutes of exposure ending</button>
+      <button class="option-btn" onclick="selectMC(this,'q15','D',false)">D. Physical activity outside accelerates metabolism and burns off the CO</button>
+      <div class="feedback" id="fb-q15"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q16. Which of the following best describes the complete chain of physiological events in this case, from CO exposure to symptom resolution?</div>
+      <button class="option-btn" onclick="selectMC(this,'q16','A',false)">A. CO damages lung tissue → less O₂ absorbed → brain deprived → symptoms → fresh air heals lung tissue</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','B',true)">B. CO inhaled → binds hemoglobin forming carboxyhemoglobin → O₂ delivery to tissues blocked → brain's high metabolic demand causes neurological symptoms first → fresh air displaces CO from hemoglobin → O₂ delivery restored → symptoms resolve</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','C',false)">C. CO absorbed through skin → enters bloodstream → clogs capillaries → tissues starved → fresh air dilates capillaries and restores flow</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','D',false)">D. CO enters stomach → absorbed into blood → lowers blood pH → brain compensates by reducing neural activity → fresh air normalizes pH</button>
+      <div class="feedback" id="fb-q16"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q17. Reflecting on the nurse's clinical reasoning throughout this case, which of the following skills did she demonstrate? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q17')">A. Pattern recognition — identifying a shared symptom cluster across multiple students and locations</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q17')">B. Differential reasoning — systematically evaluating and ruling out alternative explanations</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q17')">C. Physiological application — connecting observed symptoms to a specific mechanism of cellular oxygen deprivation</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q17')">D. Pharmacological intervention — selecting and administering the correct antidote for CO poisoning</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q17')">E. Environmental reasoning — using building conditions such as sealed windows and heating system as diagnostic clues</button>
+      <button class="check-btn" onclick="checkMA('q17',['A','B','C','E'])">Check my answers</button>
+      <div class="feedback" id="fb-q17"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q18. This case demonstrates that nurses must sometimes advocate for patient safety against social pressure, using physiological knowledge to defend a clinical position even when others disagree.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q18','True',true)">True</button>
+        <button class="tf-btn" onclick="selectTF(this,'q18','False',false)">False</button>
+      </div>
+      <div class="feedback" id="fb-q18"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(3)">Back</button>
+      <button class="nav-btn primary" onclick="buildSummary()">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — SUMMARY -->
+  <div id="phase-5" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers cannot be changed.</div>
+
+    <div class="summary-header">
+      <h2>Case Study 1 — Submission Summary</h2>
+      <p>Human Physiology &nbsp;|&nbsp; BIO 208 &nbsp;|&nbsp; Something in the Air</p>
+    </div>
+
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-fraction">—</div>
+        <div class="score-label">Questions correct</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div class="score-pct" id="score-pct">—</div>
+        <div class="score-label">Final score</div>
+      </div>
+    </div>
+
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment. Your instructor will use this summary to verify your completion and score.
+    </div>
+
+    <div class="summary-section">
+      <div class="summary-section-title">Phase 1 — Pattern recognition</div>
+      <div id="sq-q1"></div>
+      <div id="sq-q2"></div>
+      <div id="sq-q3"></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Phase 2 — Evaluating alternative explanations</div>
+      <div id="sq-q4"></div>
+      <div id="sq-q5"></div>
+      <div id="sq-q6"></div>
+      <div id="sq-q7"></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Phase 3 — Physiological reasoning</div>
+      <div id="sq-q8"></div>
+      <div id="sq-q9"></div>
+      <div id="sq-q10"></div>
+      <div id="sq-q11"></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Phase 4 — Making the case</div>
+      <div id="sq-q12"></div>
+      <div id="sq-q13"></div>
+      <div id="sq-q14"></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Phase 5 — Resolution and physiological analysis</div>
+      <div id="sq-q15"></div>
+      <div id="sq-q16"></div>
+      <div id="sq-q17"></div>
+      <div id="sq-q18"></div>
+    </div>
+
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Case study locked and complete</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var answerLog = {};
+var mcLocked = {};
+var tfLocked = {};
+var maLocked = {};
+
+var questions = {
+  'q1':  { text: 'Q1. What does the symptom pattern most strongly suggest?', correct: 'C', correctLabel: 'C. A shared environmental exposure affecting multiple students simultaneously', explanation: 'When multiple students from the same location develop identical symptoms simultaneously with no fever or rash, a shared environmental cause is the most epidemiologically sound explanation. Viral infections spread over time — they do not strike multiple people at once.' },
+  'q2':  { text: 'Q2. Absence of fever makes a bacterial or viral infection most likely. (T/F)', correct: 'False', correctLabel: 'False', explanation: 'The absence of fever actually argues against infection. Most bacterial and viral illnesses trigger a fever response as part of the immune system\'s reaction. The lack of fever here makes a shared environmental exposure more plausible.' },
+  'q3':  { text: 'Q3. Why might heart rate increase when oxygen delivery to tissues is reduced?', correct: 'B', correctLabel: 'B. The heart beats faster to push more blood to oxygen-starved tissues — a compensatory homeostatic response', explanation: 'When tissues are not receiving adequate oxygen, the cardiovascular system compensates by increasing cardiac output. The heart beats faster to deliver more blood — and whatever oxygen-carrying capacity remains — throughout the body. This is a classic homeostatic compensation response.' },
+  'q4':  { text: 'Q4. You should accept the test anxiety explanation and send students back to class. (T/F)', correct: 'False', correctLabel: 'False', explanation: 'A nurse\'s responsibility is to evaluate all possibilities before accepting a social explanation. Physical signs, the clustered pattern across two classrooms, and rapid onset all require ruling out a physiological cause first.' },
+  'q5':  { text: 'Q5. Which features argue AGAINST test anxiety as the sole explanation?', correct: ['A','B','D'], correctLabel: 'A, B, and D', explanation: 'Spread across two classrooms argues against a single contagion source. Objective physical signs like elevated heart rate go beyond subjective anxiety. The tight time window suggests a shared exposure moment, not a gradually spreading illness. Same grade level (C) and no fever (E) do not specifically argue against test anxiety.' },
+  'q6':  { text: 'Q6. Why do young children show symptoms of airborne exposure more quickly?', correct: 'B', correctLabel: 'B. Children have higher metabolic and respiratory rates, inhaling more air — and any airborne toxin — relative to body weight', explanation: 'Children have higher basal metabolic and respiratory rates than adults. They breathe more air relative to body weight, which means they accumulate airborne toxins like CO more rapidly. This is why children are often more severely affected before adults in the same environment even notice symptoms.' },
+  'q7':  { text: 'Q7. What does the multi-location pattern tell you about the likely source?', correct: 'C', correctLabel: 'C. It points to a building-wide environmental source affecting the shared air supply', explanation: 'When students in multiple separate locations across the building all share the same symptoms, a person-to-person contagious illness becomes very unlikely. The building\'s shared ventilation system carrying an airborne agent is the most logical explanation.' },
+  'q8':  { text: 'Q8. What is the most likely cause of the outbreak?', correct: 'C', correctLabel: 'C. Carbon monoxide poisoning from a faulty heating system circulating through the building', explanation: 'The combination of a sealed building, a running heater, neurological symptoms without fever, and spread across multiple locations points strongly to CO from a faulty heating system. This is a classic real-world presentation of CO poisoning.' },
+  'q9':  { text: 'Q9. Which statements accurately describe how CO affects the body?', correct: ['A','C','D','E'], correctLabel: 'A, C, D, and E', explanation: 'CO binds hemoglobin with roughly 200 times the affinity of O₂ (A), forms carboxyhemoglobin that cannot carry oxygen (C), and does so while breathing continues normally making it invisible (D). The brain suffers first due to its enormous oxygen demand (E). CO does not destroy red blood cells — option B is incorrect.' },
+  'q10': { text: 'Q10. CO poisoning always shows obvious visible signs like blue skin or labored breathing. (T/F)', correct: 'False', correctLabel: 'False', explanation: 'CO poisoning is often called the "silent killer" because victims frequently look completely normal. CO displaces O₂ on hemoglobin but blood still circulates normally. Skin may remain pink or even appear cherry-red in severe cases. Victims can lose consciousness without ever appearing cyanotic or short of breath.' },
+  'q11': { text: 'Q11. Why do neurological symptoms appear first in CO poisoning?', correct: 'A', correctLabel: 'A. The brain consumes ~20% of the body\'s oxygen despite being only ~2% of body weight, making it first to suffer when O₂ delivery drops', explanation: 'The brain accounts for approximately 20% of total body oxygen consumption despite representing only about 2% of body mass. It has no significant oxygen storage capacity, making it extraordinarily sensitive to any disruption in oxygen delivery — symptoms appear within minutes.' },
+  'q12': { text: 'Q12. The boiler maintenance detail is the primary evidence — without it the case is not valid. (T/F)', correct: 'False', correctLabel: 'False', explanation: 'The nurse\'s hypothesis was built on physiological evidence: symptom cluster, pattern of spread, and environmental context. Mrs. Okafor\'s detail corroborates and strengthens the case, but the clinical reasoning based on physiology came first and stands independently.' },
+  'q13': { text: 'Q13. Which pieces of evidence should the nurse present to justify evacuation?', correct: ['A','C','D','E','F'], correctLabel: 'A, C, D, E, and F', explanation: 'The strongest evidence includes: the multi-location symptom cluster (A), objective physical signs (C), the sealed building environment (D), the boiler maintenance history (E), and the behavioral observation from the PE teacher that is inconsistent with test anxiety (F). Ms. Garvey\'s opinion (B) is a social claim, not physiological evidence.' },
+  'q14': { text: 'Q14. If students feel better outside, does that prove it was CO?', correct: 'C', correctLabel: 'C. Yes — removal of the suspected cause followed by symptom resolution is itself a form of physiological evidence', explanation: 'In clinical reasoning, when the suspected environmental cause is removed and symptoms resolve predictably, that resolution supports the hypothesis. If the cause were test anxiety, moving outside would not consistently resolve headaches, dizziness, and fatigue across all students within 20 minutes.' },
+  'q15': { text: 'Q15. What drives symptom reversal once students are in fresh air?', correct: 'B', correctLabel: 'B. Increased O₂ in fresh air competitively displaces CO from hemoglobin, restoring oxyhemoglobin and normal oxygen delivery', explanation: 'CO binds hemoglobin reversibly. In fresh air, the high concentration of O₂ creates competitive pressure that gradually displaces CO from hemoglobin, converting carboxyhemoglobin back to oxyhemoglobin and restoring oxygen delivery to tissues. This is why fresh air is the immediate and most important treatment.' },
+  'q16': { text: 'Q16. Which best describes the complete physiological chain of events?', correct: 'B', correctLabel: 'B. CO inhaled → forms carboxyhemoglobin → O₂ delivery blocked → brain\'s high demand causes neurological symptoms first → fresh air displaces CO → O₂ restored → symptoms resolve', explanation: 'This is the accurate physiological sequence: CO enters through normal respiration, binds hemoglobin with high affinity forming carboxyhemoglobin, blocks oxygen delivery to all tissues, the metabolically demanding brain shows symptoms first, and fresh air\'s high O₂ concentration gradually reverses the hemoglobin binding and restores function.' },
+  'q17': { text: 'Q17. Which clinical reasoning skills did the nurse demonstrate?', correct: ['A','B','C','E'], correctLabel: 'A, B, C, and E', explanation: 'The nurse used pattern recognition (A), differential reasoning to rule out test anxiety (B), physiological application connecting symptoms to cellular oxygen deprivation (C), and environmental reasoning using the building context (E). Option D is incorrect — administering CO antidotes requires emergency medical services, not school nursing.' },
+  'q18': { text: 'Q18. Nurses must sometimes advocate for safety against social pressure using physiological knowledge. (T/F)', correct: 'True', correctLabel: 'True', explanation: 'This case illustrates a core nursing competency: the ability to maintain a clinical position supported by physiological reasoning even when faced with social pressure from authority figures. The nurse\'s knowledge of physiology gave her the foundation to act decisively and correctly.' }
+};
+
+function selectMC(btn, qid, letter, isCorrect) {
+  if (mcLocked[qid]) return;
+  mcLocked[qid] = true;
+  var siblings = btn.parentElement.querySelectorAll('.option-btn:not(.multi)');
+  siblings.forEach(function(b) { b.disabled = true; });
+  answerLog[qid] = { selected: letter, correct: isCorrect };
+  var fb = document.getElementById('fb-' + qid);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className = 'feedback show-correct';
+    fb.textContent = 'Correct. ' + questions[qid].explanation;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback show-incorrect';
+    fb.textContent = 'Not quite. ' + questions[qid].explanation;
+    siblings.forEach(function(b) {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(',true)') !== -1) b.classList.add('correct');
+    });
+  }
+}
+
+function selectTF(btn, qid, label, isCorrect) {
+  if (tfLocked[qid]) return;
+  tfLocked[qid] = true;
+  var siblings = btn.parentElement.querySelectorAll('.tf-btn');
+  siblings.forEach(function(b) { b.disabled = true; });
+  answerLog[qid] = { selected: label, correct: isCorrect };
+  var fb = document.getElementById('fb-' + qid);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className = 'feedback show-correct';
+    fb.textContent = 'Correct. ' + questions[qid].explanation;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback show-incorrect';
+    fb.textContent = 'Not quite. ' + questions[qid].explanation;
+    siblings.forEach(function(b) { if (b !== btn) b.classList.add('correct'); });
+  }
+}
+
+function toggleMA(btn, qid) {
+  if (maLocked[qid]) return;
+  btn.classList.toggle('multi-selected');
+}
+
+function checkMA(qid, correctArr) {
+  if (maLocked[qid]) return;
+  maLocked[qid] = true;
+  var block = document.getElementById('fb-' + qid).parentElement;
+  var selected = [];
+  block.querySelectorAll('.option-btn.multi').forEach(function(b) {
+    b.disabled = true;
+    var letter = b.getAttribute('data-letter');
+    var wasSelected = b.classList.contains('multi-selected');
+    if (wasSelected) selected.push(letter);
+    b.classList.remove('multi-selected');
+    if (correctArr.indexOf(letter) !== -1) b.classList.add('correct');
+    else if (wasSelected) b.classList.add('incorrect');
+  });
+  var isCorrect = JSON.stringify(selected.slice().sort()) === JSON.stringify(correctArr.slice().sort());
+  answerLog[qid] = { selected: selected, correct: isCorrect };
+  var fb = document.getElementById('fb-' + qid);
+  fb.className = isCorrect ? 'feedback show-correct' : 'feedback show-partial';
+  fb.textContent = (isCorrect ? 'Correct. ' : 'Not quite. ') + questions[qid].explanation;
+}
+
+function goPhase(n) {
+  document.querySelectorAll('.phase').forEach(function(p, i) { p.classList.toggle('active', i === n); });
+  document.querySelectorAll('.prog-seg').forEach(function(s, i) {
+    s.classList.remove('done','active');
+    if (i < n) s.classList.add('done');
+    if (i === n) s.classList.add('active');
+  });
+  window.scrollTo(0, 0);
+}
+
+function buildSummary() {
+  var qids = Object.keys(questions);
+  var totalQ = qids.length;
+  var correctCount = 0;
+
+  qids.forEach(function(qid) {
+    var q = questions[qid];
+    var log = answerLog[qid];
+    var container = document.getElementById('sq-' + qid);
+    if (!container) return;
+
+    var isCorrect = log ? log.correct : false;
+    if (isCorrect) correctCount++;
+
+    var selectedLabel = '—';
+    if (log) {
+      if (Array.isArray(log.selected)) selectedLabel = log.selected.length > 0 ? log.selected.join(', ') : 'None selected';
+      else selectedLabel = log.selected;
+    }
+
+    var html = '<div class="summary-q-block ' + (isCorrect ? 'sq-correct' : 'sq-incorrect') + '">';
+    html += '<div class="sq-label ' + (isCorrect ? 'correct' : 'incorrect') + '">' + (isCorrect ? '&#10003; Correct' : '&#10007; Incorrect') + '</div>';
+    html += '<div class="sq-question">' + q.text + '</div>';
+    html += '<div class="sq-answer your"><strong>Your answer:</strong> ' + selectedLabel + '</div>';
+    if (!isCorrect) {
+      html += '<div class="sq-answer right"><strong>Correct answer:</strong> ' + q.correctLabel + '</div>';
+      html += '<div class="sq-explanation">' + q.explanation + '</div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  });
+
+  var pct = Math.round((correctCount / totalQ) * 100);
+  var scoreFrac = document.getElementById('score-fraction');
+  var scorePct = document.getElementById('score-pct');
+  scoreFrac.textContent = correctCount + ' / ' + totalQ;
+  scoreFrac.className = 'score-big ' + (pct >= 70 ? 'pass' : 'fail');
+  scorePct.textContent = pct + '%';
+
+  document.getElementById('summary-date-display').textContent = 'Completed: ' + new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  document.querySelectorAll('.phase').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('phase-5').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s) { s.classList.add('done'); s.classList.remove('active'); });
+  window.scrollTo(0, 0);
+}
+
+function updateName(val) {
+  document.getElementById('summary-name-display').textContent = val.trim() || '—';
+}
+</script>
+</body>
+</html>
