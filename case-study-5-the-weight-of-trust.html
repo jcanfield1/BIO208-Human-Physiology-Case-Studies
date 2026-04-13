@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 5 — The Weight of Trust | Human Physiology</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;--blue-dark:#0C447C;
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --purple:#534AB7;--purple-light:#EEEDFE;
+  --gray-bg:#f8f7f4;--gray-border:#e2e0d8;
+  --text-primary:#1a1917;--text-secondary:#5F5E5A;
+  --radius-md:8px;--radius-lg:12px;
+}
+body{font-family:Georgia,serif;background:var(--gray-bg);color:var(--text-primary);line-height:1.7;min-height:100vh;}
+.page-header{background:#1a1428;color:white;padding:2rem 1.5rem 1.5rem;text-align:center;}
+.page-header .course-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:8px;}
+.page-header h1{font-size:28px;font-weight:normal;font-style:italic;margin-bottom:6px;}
+.page-header .tagline{font-family:Arial,sans-serif;font-size:14px;color:rgba(255,255,255,.65);}
+.wrap{max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:8px;}
+.progress-bar{display:flex;gap:5px;}
+.prog-seg{flex:1;height:5px;border-radius:3px;background:var(--gray-border);transition:background .4s;}
+.prog-seg.done{background:var(--teal);}
+.prog-seg.active{background:var(--blue-mid);}
+.phase{display:none;}
+.phase.active{display:block;}
+.phase-heading{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:8px;margin-bottom:1.5rem;}
+.scene-card{background:white;border-radius:0 var(--radius-lg) var(--radius-lg) 0;border:1px solid var(--gray-border);border-left:4px solid var(--blue-mid);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.scene-card.warn{border-left-color:var(--amber);}
+.scene-card.alert{border-left-color:var(--red);}
+.scene-card.ok{border-left-color:var(--teal);}
+.scene-card.quiet{border-left-color:#534AB7;background:#fdfcff;}
+.scene-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:8px;}
+.scene-text{font-size:15px;line-height:1.75;}
+.dialogue{background:#fafaf8;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;}
+.dialogue-speaker{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;}
+.dialogue-text{font-size:15px;font-style:italic;line-height:1.65;}
+.memory-flash{background:#1a1428;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid #7F77DD;}
+.memory-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#AFA9EC;margin-bottom:8px;}
+.memory-text{font-size:15px;color:rgba(255,255,255,.88);line-height:1.8;font-style:italic;}
+.er-scene{background:#1a1917;border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid var(--red);}
+.er-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#f09595;margin-bottom:8px;}
+.er-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.85;}
+.confrontation-scene{background:#1a1428;border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid #534AB7;}
+.confrontation-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#AFA9EC;margin-bottom:8px;}
+.confrontation-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.85;}
+.vitals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem;}
+.vital-card{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:.75rem 1rem;}
+.vital-label{font-family:Arial,sans-serif;font-size:10px;color:var(--text-secondary);margin-bottom:4px;}
+.vital-value{font-size:18px;font-family:Arial,sans-serif;font-weight:bold;color:var(--text-primary);}
+.vital-note{font-family:Arial,sans-serif;font-size:10px;color:var(--amber);margin-top:2px;}
+.vital-note.danger{color:var(--red);}
+.question-block{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.q-tag{display:inline-block;font-family:Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:3px 9px;margin-bottom:10px;}
+.tag-mc{background:var(--blue-light);color:var(--blue-dark);}
+.tag-tf{background:var(--teal-light);color:var(--teal-dark);}
+.tag-ma{background:var(--amber-light);color:var(--amber-dark);}
+.q-text{font-family:Arial,sans-serif;font-size:15px;font-weight:bold;line-height:1.6;margin-bottom:1rem;}
+.option-btn{display:block;width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:8px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;line-height:1.5;transition:border-color .15s,background .15s;}
+.option-btn:hover:not([disabled]){background:var(--gray-bg);border-color:#b4b2a9;}
+.option-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.option-btn.incorrect{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.option-btn.multi-selected{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);}
+.tf-wrap{display:flex;gap:10px;flex-direction:column;}
+.tf-btn{width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;line-height:1.5;}
+.tf-btn:hover:not([disabled]){background:var(--gray-bg);}
+.tf-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.tf-btn.incorrect{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-md);font-size:14px;font-family:Arial,sans-serif;line-height:1.6;display:none;}
+.feedback.show-correct{display:block;background:var(--teal-light);color:var(--teal-dark);}
+.feedback.show-incorrect{display:block;background:var(--red-light);color:var(--red);}
+.feedback.show-partial{display:block;background:var(--amber-light);color:var(--amber-dark);}
+.check-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 18px;font-size:13px;font-family:Arial,sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:8px;transition:all .15s;}
+.check-btn:hover{background:var(--gray-bg);color:var(--text-primary);}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--gray-border);}
+.nav-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 24px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.nav-btn:hover:not([disabled]){background:var(--gray-bg);}
+.nav-btn[disabled]{opacity:.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);color:white;border-color:var(--blue);}
+.nav-btn.primary:hover{background:var(--blue-dark);}
+.summary-header{background:#1a1428;color:white;border-radius:var(--radius-lg);padding:1.75rem 1.5rem;text-align:center;margin-bottom:1.5rem;}
+.summary-header h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:4px;}
+.summary-header p{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.7);}
+.score-banner{display:flex;align-items:center;justify-content:center;gap:2rem;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-block{text-align:center;}
+.score-big{font-size:52px;font-family:Arial,sans-serif;font-weight:bold;line-height:1;}
+.score-big.pass{color:var(--teal);}
+.score-big.fail{color:var(--red);}
+.score-label{font-family:Arial,sans-serif;font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.score-divider{width:1px;height:60px;background:var(--gray-border);}
+.stamp-block{border:2px solid var(--teal);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;margin-bottom:1.5rem;background:var(--teal-light);}
+.stamp-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-dark);margin-bottom:6px;}
+.stamp-name{font-size:22px;color:var(--teal-dark);margin-bottom:4px;}
+.stamp-date{font-family:Arial,sans-serif;font-size:13px;color:var(--teal-dark);}
+.name-input-row{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;}
+.name-input-row label{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;}
+.name-input-row input{width:100%;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 12px;font-size:15px;font-family:Georgia,serif;color:var(--text-primary);background:white;}
+.name-input-row input:focus{outline:none;border-color:var(--blue-mid);}
+.submit-instructions{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-family:Arial,sans-serif;font-size:14px;color:var(--amber-dark);line-height:1.7;}
+.summary-section{margin-bottom:1.75rem;}
+.summary-section-title{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:6px;margin-bottom:1rem;}
+.sq-block{border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:10px;background:white;}
+.sq-block.correct{border-left:4px solid var(--teal);}
+.sq-block.incorrect{border-left:4px solid var(--red);}
+.sq-block.partial{border-left:4px solid var(--amber);}
+.sq-status{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sq-status.c{color:var(--teal-dark);}
+.sq-status.i{color:var(--red);}
+.sq-status.p{color:var(--amber-dark);}
+.sq-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;float:right;}
+.sq-question{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;}
+.sq-answer{font-family:Arial,sans-serif;font-size:14px;margin-bottom:4px;}
+.sq-correct-ans{color:var(--teal-dark);}
+.sq-expl{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:8px;border-top:.5px solid var(--gray-border);padding-top:8px;}
+.locked-notice{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius-md);padding:10px 14px;font-family:Arial,sans-serif;font-size:13px;color:var(--red);text-align:center;margin-bottom:1.5rem;}
+@media print{
+  .page-header,.progress-wrap,.nav-row,.submit-instructions,.name-input-row,.locked-notice{display:none!important;}
+  .phase{display:none!important;}
+  #phase-summary{display:block!important;}
+  body{background:white;}
+  .summary-header,.stamp-block{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Human Physiology — Undergraduate Nursing | Case Study 5 of 5</div>
+  <h1>The Weight of Trust</h1>
+  <div class="tagline">An ER doctor, a patient in crisis, and a physician he tried to stop years ago</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your progress</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+      <div class="prog-seg" id="ps6"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 0 — ARRIVAL -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">City General Hospital Emergency Department &nbsp;—&nbsp; Tuesday, 11:22 PM</div>
+    <div class="scene-card">
+      <div class="scene-label">Who you are</div>
+      <div class="scene-text">You are Dr. John Wylie, 48, emergency medicine physician. You have worked this ER for nineteen years. You have been offered department chief twice and declined both times. You are exactly where you want to be — at the bedside, in the room, in the middle of things. The ER at eleven on a Tuesday is a particular kind of busy: not chaos, just the steady accumulation of people who waited too long or had nowhere else to go. You are on your fourth hour of a twelve-hour shift when the ambulance bay doors open.</div>
+    </div>
+    <div class="er-scene">
+      <div class="er-label">11:22 PM — bay three</div>
+      <div class="er-text">Abby is 31 years old and she arrives conscious, which is something. She is on a stretcher with both hands pressed against her abdomen, breathing in short controlled pulls the way people breathe when breathing hurts. Her face is the color of old paper. Her husband Noah is beside her — he came in the ambulance, he refused not to — and he is holding her hand with both of his and looking at you with the particular expression of someone who has been frightened for hours and is now terrified.<br><br>"She's been in pain since this afternoon," he says before you can ask. "It kept getting worse. She's pregnant — eight weeks — she thinks she's losing the baby. Please."</div>
+    </div>
+
+    <div class="vitals-grid">
+      <div class="vital-card"><div class="vital-label">Blood Pressure</div><div class="vital-value">94/62</div><div class="vital-note danger">hypotensive</div></div>
+      <div class="vital-card"><div class="vital-label">Heart Rate</div><div class="vital-value">118 bpm</div><div class="vital-note danger">tachycardic</div></div>
+      <div class="vital-card"><div class="vital-label">Resp. Rate</div><div class="vital-value">22/min</div><div class="vital-note">elevated</div></div>
+      <div class="vital-card"><div class="vital-label">O2 Sat</div><div class="vital-value">96%</div><div class="vital-note">borderline</div></div>
+      <div class="vital-card"><div class="vital-label">Temp</div><div class="vital-value">37.1°C</div></div>
+      <div class="vital-card"><div class="vital-label">Abdomen</div><div class="vital-value">Distended</div><div class="vital-note danger">significant</div></div>
+    </div>
+
+    <div class="scene-card warn">
+      <div class="scene-label">Initial assessment</div>
+      <div class="scene-text">Abby's abdomen is visibly distended and exquisitely tender on palpation. She winces and pulls away when you press even gently on her lower quadrants. There is no rebound tenderness suggesting perforation but the degree of distension is significant. She is hypotensive and tachycardic — her body is compensating for something. Bedside ultrasound shows free fluid in the pelvis and abdomen. The intrauterine pregnancy is visible. There is a fetal heartbeat. For now.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q1. Abby is hypotensive, tachycardic, and has significant abdominal distension with free pelvic fluid on ultrasound. She is eight weeks pregnant and has been in worsening pain since this afternoon. What is the most likely physiological explanation for the free fluid and hemodynamic instability?</div>
+      <button class="option-btn" onclick="selectMC(this,'q1','A',false)">A. Ectopic pregnancy with rupture — free fluid represents hemoperitoneum from a ruptured fallopian tube</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','B',true)">B. Severe ovarian hyperstimulation syndrome — the free fluid represents third-spacing of protein-rich fluid from hyperpermeable ovarian blood vessels, causing intravascular volume depletion and hemodynamic compromise</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','C',false)">C. Acute appendicitis with peritoneal irritation causing reactive fluid accumulation</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','D',false)">D. Placental abruption causing intraabdominal hemorrhage at eight weeks gestation</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p1" onclick="goPhase(1)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 — THE HISTORY -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Bay three &nbsp;—&nbsp; 11:38 PM</div>
+    <div class="scene-card">
+      <div class="scene-label">Taking the history</div>
+      <div class="scene-text">You sit on the edge of the stretcher so Abby does not have to raise her voice. Noah is on her other side. She is more stable now — IV fluids running, pain management started — but still frightened. She answers your questions carefully, like someone who has been through enough medical appointments to know that the details matter.</div>
+    </div>
+
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Tell me about the pregnancy. Was this a natural conception?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Abby</div>
+      <div class="dialogue-text">"No. We've been trying for four years. I had — my care wasn't managed well when I was younger. Some scarring. We were told conceiving naturally would be very difficult."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Noah</div>
+      <div class="dialogue-text">"We found a specialist about eight months ago. He started her on a protocol — gonadotropins for stimulation, and then this newer drug, it's called Velitrin. It's expensive. I took a second job. We did two failed cycles and then this one worked. She was improving. We thought — " He stops. He looks at his wife. "We thought we were finally getting somewhere."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Who is your specialist?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Abby</div>
+      <div class="dialogue-text">"Dr. Gregory Marsh. He's been — he's been very involved. He really believed this would work."</div>
+    </div>
+
+    <div class="scene-card quiet">
+      <div class="scene-label">A name you know</div>
+      <div class="scene-text">You write the name on the chart. You read it back. You write it again. Gregory Marsh. You tell the nurse to contact Dr. Marsh and ask him to come to the hospital. You keep your voice even. You finish the assessment. You do not say anything else about it yet.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q2. Ovarian hyperstimulation syndrome occurs as a complication of fertility treatment. What is the underlying physiological mechanism that causes the dangerous fluid shifts seen in severe OHSS?</div>
+      <button class="option-btn" onclick="selectMC(this,'q2','A',false)">A. Ovarian enlargement physically compresses the inferior vena cava, reducing venous return and causing fluid to back up into the abdominal cavity</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','B',false)">B. Elevated progesterone levels cause the kidneys to retain sodium and water, producing generalized edema and ascites</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','C',true)">C. Ovarian hyperstimulation causes the release of vasoactive substances — particularly VEGF — that dramatically increase capillary permeability, causing protein-rich fluid to leak from the intravascular space into the abdomen and pleural cavity, depleting circulating blood volume</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','D',false)">D. Gonadotropin excess directly damages the hepatic portal system, causing portal hypertension and ascites formation</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q3. In severe OHSS, the patient's total body fluid is actually increased — but the dangerous hemodynamic compromise occurs because that fluid has shifted out of the vascular space into third spaces such as the abdomen and pleural cavity, leaving the intravascular compartment depleted.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q3','True',true)">True — this paradox is the defining physiological feature of severe OHSS: fluid overload and intravascular dehydration occurring simultaneously, which is why aggressive IV fluid resuscitation requires careful monitoring</button>
+        <button class="tf-btn" onclick="selectTF(this,'q3','False',false)">False — severe OHSS causes true total body fluid depletion through excess renal excretion triggered by elevated hormone levels</button>
+      </div>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(0)">Back</button>
+      <button class="nav-btn primary" id="nav-p2" onclick="goPhase(2)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — THE RECOGNITION -->
+  <div id="phase-2" class="phase">
+    <div class="phase-heading">ER corridor &nbsp;—&nbsp; 12:14 AM</div>
+
+    <div class="memory-flash">
+      <div class="memory-label">John's memory — a patient room, years ago</div>
+      <div class="memory-text">A woman in her seventies describing her chest pain. The specific way she described it — not pressure, more like something pulling — a detail that mattered. Greg Marsh had been standing at the foot of the bed in his short white coat with his phone in his hand, thumb moving. John had said his name once, quietly. Greg had looked up and smiled and pocketed the phone and looked at the patient with an expression of attention that John recognized immediately as performed. His eyes were already somewhere else. Already in whatever lab or paper or project was more interesting than this room and this woman and the detail she was trying to give them.<br><br>Afterward John had gone to the program director. He had documentation — three separate incidents, a pattern, a patient who had asked not to have the student in her room again. He had said: this person is a clinical danger. He had been told that Greg's academic record was excellent, that one attending's concern was insufficient without a sustained documented pattern, that these decisions required more than a subjective assessment. Greg had passed his ER rotation. John had signed nothing he was comfortable signing. He had never forgotten it.</div>
+    </div>
+
+    <div class="confrontation-scene">
+      <div class="confrontation-label">12:17 AM — the ambulance bay doors</div>
+      <div class="confrontation-text">He comes through the doors in a jacket over a dress shirt, no tie, the look of someone who got dressed quickly from somewhere comfortable. He is in his mid-thirties and he looks successful in the specific way people look when they have built something they are proud of — confident posture, good shoes, the easy authority of someone who is used to being in charge of his own space.<br><br>He sees John at the nurses' station and stops.<br><br>John sees him and does not move.<br><br>It is immediate and mutual and there is a full second where neither of them says anything and the ER noise continues around them as if nothing significant is happening.</div>
+    </div>
+
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh</div>
+      <div class="dialogue-text">"Dr. Wylie. I didn't — I didn't know you were here." A beat. Then the recovery, smooth and practiced: "It's good to see you. It's been a long time."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Your patient is in bay three. Walk with me."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh</div>
+      <div class="dialogue-text">"Of course. I've been following her progress closely — she was doing really well on the Velitrin protocol. Her estradiol levels were — " He is walking beside you now, talking with the confidence of someone who wants to be seen as competent. "I actually just presented her case at a symposium last month. The outcomes data on Velitrin has been really promising. I know it's expensive but the company has been very supportive — "</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"I know about the company."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — a slight pause</div>
+      <div class="dialogue-text">"It's a legitimate partnership. I believe in the drug. I've seen it work."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — continuing, shifting</div>
+      <div class="dialogue-text">"You know I went into OB/GYN. Built my own practice — three physicians, we just expanded to a second location. Married, two kids. Things have gone well." A glance at you. "You're still in the ER."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Yes."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Your patient is in severe OHSS. She is hypotensive and tachycardic. There is significant free fluid in her abdomen and pelvis. She is eight weeks pregnant and her hemodynamic status is threatening that pregnancy. Her husband has been working two jobs to pay for a drug you are being compensated to promote, and that drug has been used off-label in her protocol. I need you to tell me everything about her treatment course. All of it."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q4. Velitrin is being used off-label as part of Abby's fertility protocol. Dr. Marsh is a paid speaker for the pharmaceutical company that manufactures it. What is the primary ethical concern with this situation?</div>
+      <button class="option-btn" onclick="selectMC(this,'q4','A',false)">A. Off-label drug use is illegal and Dr. Marsh should be criminally liable for prescribing it</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','B',true)">B. Financial relationships between physicians and pharmaceutical companies create conflicts of interest that can unconsciously influence prescribing decisions — the concern is not necessarily malicious intent but compromised objectivity that may not serve the patient's best interest</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','C',false)">C. The ethical concern is solely about informed consent — as long as Abby knew the drug was off-label there is no ethical issue with the pharmaceutical relationship</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','D',false)">D. There is no ethical concern — pharmaceutical partnerships are standard practice and physicians are capable of maintaining complete objectivity regardless of financial relationships</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(1)">Back</button>
+      <button class="nav-btn primary" id="nav-p3" onclick="goPhase(3)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 — THE PHYSIOLOGY DEEPENS -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">Bay three &nbsp;—&nbsp; 12:45 AM</div>
+    <div class="scene-card warn">
+      <div class="scene-label">Abby's condition — hour two</div>
+      <div class="scene-text">Abby's blood pressure has responded partially to fluid resuscitation — she is at 104/68 now, still borderline. The fetal heartbeat remains present. Her abdomen is still distended and painful. The clinical picture is consistent with severe OHSS complicated by early pregnancy, which is the worst version of this syndrome — hCG produced by the early placenta acts as an additional gonadotropin signal, amplifying the VEGF-driven vascular permeability that is causing the fluid shifts. The pregnancy itself is making the OHSS worse.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q5. Abby's OHSS is worsened by the presence of an early pregnancy. Why does early pregnancy amplify OHSS severity?</div>
+      <button class="option-btn" onclick="selectMC(this,'q5','A',false)">A. The developing embryo requires large amounts of fluid, drawing it from the maternal vascular compartment and worsening the fluid imbalance</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','B',true)">B. The early placenta produces hCG, which acts as a gonadotropin signal that continues to stimulate the already hyperstimulated ovaries — sustaining and amplifying VEGF release and capillary permeability — creating a self-reinforcing cycle that worsens OHSS through the first trimester</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','C',false)">C. Progesterone produced in early pregnancy directly increases capillary permeability independent of the ovarian response</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','D',false)">D. Early pregnancy suppresses the immune system, reducing the body's ability to clear the inflammatory mediators causing the fluid shifts</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q6. One of the most dangerous complications of severe OHSS is thromboembolic disease — including deep vein thrombosis and pulmonary embolism — because hemoconcentration from fluid shifting out of the vascular space increases blood viscosity and clotting risk.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q6','True',true)">True — hemoconcentration in severe OHSS significantly elevates thromboembolic risk and prophylactic anticoagulation is a critical component of management in severe cases</button>
+        <button class="tf-btn" onclick="selectTF(this,'q6','False',false)">False — OHSS primarily affects the abdominal compartment and does not significantly alter coagulation parameters or thromboembolic risk</button>
+      </div>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q7. Which of the following are appropriate immediate management priorities for a patient presenting with severe OHSS and early pregnancy? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q7')">A. Careful IV fluid resuscitation with monitoring of urine output and fluid balance</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q7')">B. Immediate termination of the pregnancy to halt hCG-driven ovarian stimulation</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q7')">C. Thromboprophylaxis with low molecular weight heparin given the elevated thromboembolic risk</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q7')">D. Serial ultrasound monitoring of ovarian size and free fluid volume</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q7')">E. Electrolyte monitoring given the risk of hyponatremia from third-space fluid shifts</button>
+      <button class="option-btn multi" data-letter="F" onclick="toggleMA(this,'q7')">F. Aggressive diuresis to reduce total body fluid volume</button>
+      <button class="check-btn" onclick="checkMA('q7',['A','C','D','E'])">Check my answers</button>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(2)">Back</button>
+      <button class="nav-btn primary" id="nav-p4" onclick="goPhase(4)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 — THE CONFRONTATION -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">Consultation room &nbsp;—&nbsp; 1:15 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">Alone with Greg</div>
+      <div class="scene-text">You have stepped out of the bay with Greg while the nurse monitors Abby. Noah is in the room with his wife. You have a narrow window and you use it. You tell Greg everything you know about Velitrin — the off-label application, the pharmaceutical payments, the absence of long-term safety data for this specific protocol in patients with Abby's history. Greg listens. He does not flinch. He leans against the wall with his arms crossed and he gives you the look of a man who has anticipated this conversation.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh</div>
+      <div class="dialogue-text">"I hear what you're saying. But she was doing well. Her estradiol levels were within range. I monitored her closely. OHSS is a known risk of any stimulation protocol — it's not exclusive to Velitrin. This could have happened on a standard gonadotropin cycle."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"It could have. And you know as well as I do that the Velitrin adjunct increases VEGF expression by a mechanism that has not been fully characterized in early pregnancy. The company's own phase two data flagged it. Did you discuss that with Abby and Noah?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — a pause</div>
+      <div class="dialogue-text">"I discussed the risks of ovarian stimulation."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"That is not the same thing."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh</div>
+      <div class="dialogue-text">"I believe in this drug, John. I've seen it work. That couple has been through years of — they needed something that would actually work and I gave them that. She's pregnant. The pregnancy is still viable."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"For now."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q8. Dr. Marsh states that he "discussed the risks of ovarian stimulation" but did not specifically discuss the additional risks associated with the off-label Velitrin adjunct. From an informed consent standpoint, what is the significance of this distinction?</div>
+      <button class="option-btn" onclick="selectMC(this,'q8','A',false)">A. There is no significant distinction — general discussion of stimulation risks is sufficient to cover all medications used in a fertility protocol</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','B',true)">B. Informed consent requires that patients be told about the specific risks of each medication they receive — particularly when a drug is being used off-label — so they can make a fully informed decision. Discussing general category risks does not satisfy this obligation for a specific drug with its own distinct risk profile</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','C',false)">C. The distinction only matters legally — ethically it is sufficient to inform patients of the most likely risks even if not all possible risks are enumerated</button>
+      <button class="option-btn" onclick="selectMC(this,'q8','D',false)">D. Because Abby was desperate to conceive she would have consented regardless, making the completeness of the consent discussion clinically irrelevant</button>
+      <div class="feedback" id="fb-q8"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q9. A physician's genuine belief that a treatment will benefit a patient is sufficient ethical justification for prescribing a drug off-label when a financial relationship exists between that physician and the drug's manufacturer.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q9','True',false)">True — sincere belief in a treatment's efficacy is the primary ethical standard in prescribing decisions</button>
+        <button class="tf-btn" onclick="selectTF(this,'q9','False',true)">False — financial relationships with pharmaceutical companies create conflicts of interest that compromise the objectivity required for ethical prescribing, regardless of the physician's subjective belief in the treatment. Sincerity does not eliminate the structural bias created by financial incentive</button>
+      </div>
+      <div class="feedback" id="fb-q9"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(3)">Back</button>
+      <button class="nav-btn primary" id="nav-p5" onclick="goPhase(5)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — TELLING ABBY AND NOAH -->
+  <div id="phase-5" class="phase">
+    <div class="phase-heading">Bay three &nbsp;—&nbsp; 1:44 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">The decision to tell them</div>
+      <div class="scene-text">You make the decision in the corridor outside the bay. Abby and Noah have the right to know. They have been making decisions based on incomplete information — financial decisions, medical decisions, decisions about their future — and the incompleteness was not accidental. You go back into the room. Greg follows. He does not stop you. He stands at the foot of the bed with his hands at his sides and for the first time tonight he looks like what he is: a man waiting to face a consequence he helped create.</div>
+    </div>
+
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Abby. Noah. I need to tell you something about the drug you've been taking, and I need to tell you now while we're making decisions about your care. It's important and it's going to be hard to hear."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Abby — her voice very quiet</div>
+      <div class="dialogue-text">"Tell me."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Velitrin was prescribed as part of your protocol off-label — meaning for a use that hasn't been fully approved or studied in patients with your specific history. Dr. Marsh has a financial relationship with the company that makes it. He is a paid speaker for them. I'm not telling you he didn't believe it would help you. I think he did believe that. But there is a conflict of interest that you were not told about, and there are risks specific to this drug that were not fully disclosed to you. You deserved to know both of those things before you made this decision."</div>
+    </div>
+
+    <div class="er-scene" style="border-left-color:#7F77DD;">
+      <div class="er-label" style="color:#AFA9EC;">What happens in that room</div>
+      <div class="er-text">Abby does not say anything for a long moment. Then she begins to cry — not quietly, not the controlled kind of crying people do in medical settings to appear composed. Real crying, the kind that comes from a place where hope and loss exist at the same time and there is no dignified way to hold both. She covers her face with both hands. Her shoulders shake. Noah reaches for her and then stops himself and looks at Greg — looks at him the way a man looks at someone who has taken something from him — and when he speaks his voice is very steady in the particular way that means he is keeping himself from something worse.<br><br>"We trusted you," he says. Not loudly. Not dramatically. Just the fact of it, stated plainly, which is somehow the worst possible way to say it. "We gave you everything we had. I worked two jobs. She went through two failed cycles. We trusted you and you were taking money from the company that made the drug you were giving her. We didn't know that. We didn't know that." He looks at the floor. "We should have known that."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q10. Dr. Wylie made the decision to inform Abby and Noah about the pharmaceutical conflict of interest in real time, while Abby was still being stabilized. What is the ethical basis for this decision?</div>
+      <button class="option-btn" onclick="selectMC(this,'q10','A',false)">A. Patients should always be informed of physician conflicts of interest but this disclosure should wait until the patient is fully stable and discharged to avoid adding stress during acute care</button>
+      <button class="option-btn" onclick="selectMC(this,'q10','B',true)">B. Patients have the right to make informed decisions about their ongoing care — disclosing the conflict of interest immediately allows Abby and Noah to make fully informed choices about treatment going forward, which outweighs the discomfort of the timing</button>
+      <button class="option-btn" onclick="selectMC(this,'q10','C',false)">C. Dr. Wylie was ethically obligated to report the conflict to the medical board before disclosing it to the patient — direct patient disclosure without institutional authorization is inappropriate</button>
+      <button class="option-btn" onclick="selectMC(this,'q10','D',false)">D. The disclosure was unnecessary because the treatment decision had already been made and the information would not change Abby's immediate clinical management</button>
+      <div class="feedback" id="fb-q10"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(4)">Back</button>
+      <button class="nav-btn primary" id="nav-p6" onclick="goPhase(6)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 6 — RESOLUTION -->
+  <div id="phase-6" class="phase">
+    <div class="phase-heading">City General Hospital &nbsp;—&nbsp; the hours that follow</div>
+    <div class="scene-card ok">
+      <div class="scene-label">Abby's condition — 4:30 AM</div>
+      <div class="scene-text">By four in the morning Abby is more stable. Blood pressure holding at 112/72. Heart rate down to 96. The free fluid is still present but has not increased. The fetal heartbeat is still there — measured, visible, persistent. She will be admitted to the OB/GYN service for monitoring. The OHSS will resolve over days to weeks as the pregnancy continues and the ovarian response gradually settles. The thromboembolic prophylaxis has been started. She is not out of danger but she is holding.</div>
+    </div>
+
+    <div class="scene-card warn">
+      <div class="scene-label">What is uncertain</div>
+      <div class="scene-text">The Velitrin adjunct's effects on the developing embryo during the period of maximum OHSS are not fully characterized. The drug's VEGF-modulating mechanism affects vascular development — and vascular development is critical in early embryogenesis. The company's phase two data had flagged a signal that had not been fully investigated before the drug was advanced. Nobody knows yet what that signal means for a baby born to a mother who received Velitrin during early pregnancy and then experienced severe OHSS. The pregnancy will continue. Abby will be monitored carefully. The baby will be watched. But the answer to what this did — if it did anything — will not come for months. Maybe longer.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q11. The Velitrin adjunct affects VEGF signaling, and VEGF plays a critical role in early embryonic vascular development. Why is this physiologically concerning for the developing baby?</div>
+      <button class="option-btn" onclick="selectMC(this,'q11','A',false)">A. VEGF excess causes direct chromosomal damage to embryonic cells during the first trimester</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','B',true)">B. VEGF is essential for the formation of the embryonic vasculature and placental blood vessel development — disruption of VEGF signaling during the critical window of early embryogenesis can impair vascular development in ways that may affect fetal growth, organ development, and placental function throughout the pregnancy</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','C',false)">C. VEGF modulation affects only the maternal vascular system and has no direct pathway to affect embryonic development</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','D',false)">D. The concern is theoretical only — no mechanism exists by which maternal VEGF dysregulation could cross the placental barrier to affect the embryo</button>
+      <div class="feedback" id="fb-q11"></div>
+    </div>
+
+    <div class="confrontation-scene" style="margin-top:1.25rem;">
+      <div class="confrontation-label">The corridor &nbsp;—&nbsp; 5:10 AM</div>
+      <div class="confrontation-text">You find Greg in the corridor outside Abby's new room on the OB floor. He has been there for an hour. He looks like a man who has been sitting with something that does not get lighter the longer you sit with it. You stand beside him and for a moment neither of you says anything. Down the hall a nurse is making notes at a station. The fluorescent lights do what fluorescent lights always do at five in the morning.</div>
+    </div>
+
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — quietly</div>
+      <div class="dialogue-text">"I really thought it would help her."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"I know you did."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh</div>
+      <div class="dialogue-text">"Does that count for anything?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Not to Noah. Not right now." A pause. "Greg. I tried to stop you from getting into clinical practice. Fifteen years ago. I raised concerns with your program director. You probably didn't know that."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — very still</div>
+      <div class="dialogue-text">"No. I didn't know that."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"I'm telling you now because I think you should know the full picture. And because I need you to understand that what I'm about to tell you is not personal. You should not be practicing clinical medicine. You were not suited to it as a student and the things that made you unsuited to it then are the things that led you to this corridor tonight. I am going to file a report with the hospital and the medical board. You should speak to an attorney."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Gregory Marsh — after a long silence</div>
+      <div class="dialogue-text">"You were always certain about everything."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. John Wylie — You</div>
+      <div class="dialogue-text">"Not everything. But this."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q12. Dr. Wylie files a report with the hospital and the medical board regarding Dr. Marsh's pharmaceutical conflict of interest and informed consent failures. Which of the following best describes why this reporting obligation exists even though Abby has already been informed and her immediate care is being managed?</div>
+      <button class="option-btn" onclick="selectMC(this,'q12','A',false)">A. Medical board reporting is primarily a legal protection for Dr. Wylie — it documents that he identified and disclosed the problem</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','B',false)">B. The report is optional — Dr. Wylie's direct confrontation with Dr. Marsh and disclosure to the patient fulfills his ethical obligations without requiring institutional action</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','C',true)">C. Medical board reporting protects future patients — Abby's case has been addressed, but Dr. Marsh's pattern of behavior, compromised prescribing, and inadequate informed consent practice represents an ongoing risk to other patients who have not yet been affected and who have no advocate in that room tonight</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','D',false)">D. Reporting is required because off-label prescribing is inherently reportable regardless of outcome or circumstances</button>
+      <div class="feedback" id="fb-q12"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q13. The fact that Dr. Marsh genuinely believed Velitrin would help Abby, and that the pregnancy is currently viable, means the ethical and reporting concerns about his prescribing practice and pharmaceutical relationship are less serious than they would be if the outcome had been worse.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q13','True',false)">True — ethical violations in medicine are judged primarily by outcome, and a surviving pregnancy mitigates the seriousness of the prescribing and consent concerns</button>
+        <button class="tf-btn" onclick="selectTF(this,'q13','False',true)">False — ethical standards in medicine are evaluated based on the process and the decision-making, not the outcome. A conflict of interest that compromised informed consent is an ethical violation regardless of whether the patient survived or the pregnancy continued. Good outcomes do not retroactively justify compromised processes</button>
+      </div>
+      <div class="feedback" id="fb-q13"></div>
+    </div>
+
+    <div class="scene-card quiet" style="margin-top:1.25rem;">
+      <div class="scene-label">What John carries out of this night</div>
+      <div class="scene-text">He files the report at 6:15 AM from the nurses' station. It takes eleven minutes. He writes it carefully, the way he has always done things — completely, without editorializing, with the facts in order and the timeline clear. He has done everything he can do tonight. The report will go where it goes. The process will be what it is. He knows better than most people how these processes work and how slowly they move and how often they produce less than they should. He files it anyway. He filed it fifteen years ago and nobody listened and he files it again tonight because that is the only thing a person of integrity can do — keep doing the right thing even when the system does not make it easy and even when it comes too late to prevent the harm it might have prevented.<br><br>At 6:40 AM he looks in on Abby. She is asleep. Noah is in the chair beside her, head back, not quite asleep. The monitor beside the bed shows two heartbeats — hers and the baby's. John stands in the doorway for a moment and does not go in. They do not need him right now. They have each other and they have the monitors and they have the uncertain months ahead of them and they do not need him standing in the doorway.<br><br>He goes back to the ER. There are people waiting.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(5)">Back</button>
+      <button class="nav-btn primary" onclick="buildSummary()">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY PAGE -->
+  <div id="phase-summary" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers and score cannot be changed.</div>
+    <div class="summary-header">
+      <h2>Case Study 5 — Submission Summary</h2>
+      <p>Human Physiology &nbsp;|&nbsp; BIO 208 &nbsp;|&nbsp; The Weight of Trust</p>
+    </div>
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-display">—</div>
+        <div class="score-label">Points earned</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div style="font-size:28px;font-family:Arial,sans-serif;font-weight:bold;" id="score-pct-display">—</div>
+        <div class="score-label">Out of 20</div>
+      </div>
+    </div>
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment.
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">All questions — your answers and explanations</div>
+      <div id="summary-questions"></div>
+    </div>
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Case study complete — all five cases finished</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var score=0;
+var mcLocked={};
+var tfLocked={};
+var maLocked={};
+var alog={};
+
+var qdefs={
+  q1:{text:'Q1. What is the most likely physiological explanation for Abby\'s free pelvic fluid and hemodynamic instability?',pts:2,
+    cl:'B — Severe OHSS causing third-spacing of protein-rich fluid from hyperpermeable ovarian blood vessels, depleting intravascular volume',
+    exp:'The combination of significant abdominal distension, free pelvic fluid, hypotension, tachycardia, and a recent fertility treatment history is the classic presentation of severe OHSS. The free fluid is not hemorrhagic — it is protein-rich fluid that has leaked from hyperstimulated ovarian blood vessels through dramatically increased capillary permeability driven by VEGF. This third-spacing depletes the intravascular compartment, producing the hemodynamic instability despite total body fluid excess.'},
+  q2:{text:'Q2. What is the physiological mechanism causing dangerous fluid shifts in severe OHSS?',pts:2,
+    cl:'C — Ovarian hyperstimulation causes VEGF release that dramatically increases capillary permeability, causing protein-rich fluid to leak from the intravascular space into the abdomen and pleural cavity',
+    exp:'Vascular endothelial growth factor (VEGF) is the primary mediator of OHSS pathophysiology. Hyperstimulated ovarian follicles release massive quantities of VEGF, which acts on capillary endothelium to dramatically increase vessel permeability. Protein-rich plasma fluid leaks through these permeable vessel walls into the peritoneal and pleural spaces. This creates the paradox of OHSS: simultaneous total body fluid excess and intravascular volume depletion.'},
+  q3:{text:'Q3. In severe OHSS the patient has total body fluid excess but is intravascularly depleted simultaneously. (T/F)',pts:1,
+    cl:'True — this paradox defines severe OHSS: fluid overload and intravascular dehydration occurring simultaneously',
+    exp:'This physiological paradox is critical for correct management. The patient has massive amounts of fluid in her abdomen and potential pleural spaces, yet her vascular compartment is depleted — producing hypotension and tachycardia despite the appearance of fluid excess. This is why management requires careful fluid resuscitation rather than diuresis, and why aggressive diuresis is actively harmful in severe OHSS.'},
+  q4:{text:'Q4. What is the primary ethical concern when a physician has a financial relationship with the manufacturer of a drug they are prescribing?',pts:1,
+    cl:'B — Financial relationships create conflicts of interest that can unconsciously influence prescribing decisions, compromising the objectivity required to serve the patient\'s best interest',
+    exp:'The ethical concern with pharmaceutical financial relationships is not necessarily conscious corruption. Research consistently demonstrates that financial relationships — even small ones — unconsciously bias physician prescribing behavior toward the products of the paying company. This structural bias compromises the objectivity that patients depend on when trusting a physician\'s recommendations. The physician\'s subjective belief in the treatment does not eliminate the objective bias created by the financial relationship.'},
+  q5:{text:'Q5. Why does early pregnancy worsen OHSS severity?',pts:2,
+    cl:'B — The early placenta produces hCG which continues to stimulate hyperstimulated ovaries, sustaining VEGF release and capillary permeability in a self-reinforcing cycle through the first trimester',
+    exp:'hCG — human chorionic gonadotropin — is produced by the developing trophoblast from the earliest stages of implantation. Because hCG has structural and functional similarities to LH, it acts as an ongoing gonadotropin signal to the already hyperstimulated ovaries. This sustains VEGF production and the increased capillary permeability it causes, creating a positive feedback loop that explains why OHSS in early pregnancy tends to be more severe and more prolonged than in non-pregnant cycles.'},
+  q6:{text:'Q6. Severe OHSS significantly elevates thromboembolic risk through hemoconcentration. (T/F)',pts:1,
+    cl:'True — hemoconcentration from third-space fluid shifts increases blood viscosity and clotting risk, making thromboprophylaxis a critical management component',
+    exp:'As protein-rich fluid leaks from the vascular compartment into third spaces, the remaining blood becomes progressively more concentrated — red blood cell count, clotting factors, and platelet concentration all increase relative to plasma volume. This hemoconcentration dramatically increases blood viscosity and thrombotic risk. Deep vein thrombosis and pulmonary embolism are among the most serious and potentially fatal complications of severe OHSS, which is why prophylactic anticoagulation is standard of care.'},
+  q7:{text:'Q7. Which interventions are appropriate immediate management priorities for severe OHSS with early pregnancy?',pts:2,
+    cl:'A, C, D, and E',
+    exp:'Careful IV fluid resuscitation (A) addresses intravascular depletion while monitoring prevents worsening third-spacing. Thromboprophylaxis (C) addresses the significant thromboembolic risk from hemoconcentration. Serial ultrasound (D) monitors disease progression. Electrolyte monitoring (E) is essential because hyponatremia can develop as sodium follows fluid into third spaces. Immediate pregnancy termination (B) is not indicated — while hCG worsens OHSS, the risk-benefit calculation does not support termination for OHSS management alone. Aggressive diuresis (F) is actively contraindicated — it would further deplete the already compromised intravascular volume by forcing fluid excretion when the problem is maldistribution, not total excess.'},
+  q8:{text:'Q8. What is the significance of discussing general stimulation risks versus specific off-label drug risks in informed consent?',pts:1,
+    cl:'B — Informed consent requires disclosure of specific risks of each medication, particularly off-label use — general category risks do not satisfy this obligation for a drug with its own distinct risk profile',
+    exp:'Informed consent is not a formality — it is the process by which patients receive the information necessary to make autonomous decisions about their care. When a drug is used off-label, the obligation to disclose is heightened, not diminished, because the patient is being asked to accept risks that have not been fully characterized through standard approval processes. Discussing the general risks of ovarian stimulation while omitting the specific additional risks of the off-label adjunct drug denies the patient the information she needed to make a fully informed choice.'},
+  q9:{text:'Q9. A physician\'s genuine belief in a treatment is sufficient ethical justification for prescribing with a pharmaceutical financial relationship present. (T/F)',pts:1,
+    cl:'False — sincerity does not eliminate the structural bias created by financial incentive, which compromises the objectivity required for ethical prescribing',
+    exp:'This is one of the most important and counterintuitive principles in medical ethics. We tend to evaluate actions by intent — if someone meant well, we are inclined to excuse the outcome. But the ethical standard in prescribing is not sincerity; it is objectivity. Financial relationships create structural biases that operate unconsciously and cannot be neutralized by good intentions. A physician can genuinely believe in a drug and still be prescribing it partly because of the financial relationship with its manufacturer. The patient deserves a physician whose recommendations are free from that bias.'},
+  q10:{text:'Q10. What is the ethical basis for Dr. Wylie\'s decision to inform Abby and Noah about the pharmaceutical conflict immediately?',pts:2,
+    cl:'B — Patients have the right to make informed decisions about ongoing care — immediate disclosure allows Abby and Noah to make fully informed choices going forward',
+    exp:'Patient autonomy requires that patients have the information necessary to make decisions about their care — not just decisions already made, but decisions being made now and in the future. Abby and Noah are making active decisions about how to manage this pregnancy going forward. They need accurate information about the drug they have been given and the physician who gave it to them. Deferring disclosure to protect comfort or avoid institutional awkwardness would prioritize convenience over the patient\'s fundamental right to know what has been done to her.'},
+  q11:{text:'Q11. Why is Velitrin\'s effect on VEGF signaling physiologically concerning for the developing baby?',pts:2,
+    cl:'B — VEGF is essential for embryonic vasculature and placental blood vessel development — disruption during the critical window of early embryogenesis can impair vascular development affecting fetal growth, organ development, and placental function',
+    exp:'VEGF is not only a mediator of adult vascular permeability — it is a fundamental driver of embryonic and fetal vascular development. The formation of the embryonic heart, the development of the placental vasculature, the growth of organ-specific blood supply networks — all of these depend on precise VEGF signaling during specific developmental windows. A drug that modulates VEGF signaling during this period introduces risk to these developmental processes. The concern is not theoretical: the company\'s own phase two data had flagged a signal suggesting the risk was real enough to warrant investigation.'},
+  q12:{text:'Q12. Why does the reporting obligation to the medical board exist even after Abby has been informed and her care is managed?',pts:1,
+    cl:'C — Medical board reporting protects future patients — Dr. Marsh\'s pattern represents an ongoing risk to patients who have no advocate',
+    exp:'The purpose of medical board reporting is not retrospective justice for past harm — it is prospective protection of future patients. Abby has been informed and is receiving appropriate care. But Dr. Marsh has other patients. He will have future patients. His pattern of compromised prescribing, inadequate informed consent, and pharmaceutical conflicts of interest will continue to affect people who have no Dr. Wylie in their room tonight advocating for them. The reporting obligation exists because individual acts of advocacy are not sufficient — the system must be engaged to protect people who are not yet harmed.'},
+  q13:{text:'Q13. A surviving pregnancy mitigates the seriousness of the prescribing and consent concerns. (T/F)',pts:1,
+    cl:'False — ethical standards are evaluated based on process and decision-making, not outcome. Good outcomes do not retroactively justify compromised processes',
+    exp:'Outcome-based ethical reasoning is one of the most common and most dangerous errors in medical thinking. If we judge ethical violations by their outcomes, we create a system that tolerates bad processes whenever they produce acceptable results — until the day they produce a catastrophic one. The conflict of interest was real regardless of outcome. The informed consent failure was real regardless of outcome. The baby\'s uncertain future is not erased by the fact that there is a heartbeat tonight. Ethics evaluates what was done and how it was decided, not whether the patient was lucky.'}
+};
+
+var phaseQuestions={0:['q1'],1:['q2','q3'],2:['q4'],3:['q5','q6','q7'],4:['q8','q9'],5:['q10'],6:['q11','q12','q13']};
+var currentPhase=0;
+
+function selectMC(btn,qid,letter,isCorrect){
+  if(mcLocked[qid])return;
+  mcLocked[qid]=true;
+  var siblings=btn.parentElement.querySelectorAll('.option-btn:not(.multi)');
+  siblings.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:btn.textContent.trim().substring(0,80),correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    siblings.forEach(function(b){if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf(',true)')!==-1)b.classList.add('correct');});
+    alog[qid]={sel:btn.textContent.trim().substring(0,80),correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  checkPhaseComplete();
+}
+
+function selectTF(btn,qid,label,isCorrect){
+  if(tfLocked[qid])return;
+  tfLocked[qid]=true;
+  var siblings=btn.parentElement.querySelectorAll('.tf-btn');
+  siblings.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:label,correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    siblings.forEach(function(b){if(b!==btn)b.classList.add('correct');});
+    alog[qid]={sel:label,correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  checkPhaseComplete();
+}
+
+function toggleMA(btn,qid){
+  if(maLocked[qid])return;
+  btn.classList.toggle('multi-selected');
+}
+
+function checkMA(qid,correctArr){
+  if(maLocked[qid])return;
+  maLocked[qid]=true;
+  var block=document.getElementById('fb-'+qid).parentElement;
+  var selected=[];
+  block.querySelectorAll('.option-btn.multi').forEach(function(b){
+    b.disabled=true;
+    var letter=b.getAttribute('data-letter');
+    var wasSelected=b.classList.contains('multi-selected');
+    if(wasSelected)selected.push(letter);
+    b.classList.remove('multi-selected');
+    if(correctArr.indexOf(letter)!==-1)b.classList.add('correct');
+    else if(wasSelected)b.classList.add('incorrect');
+  });
+  var isCorrect=JSON.stringify(selected.slice().sort())===JSON.stringify(correctArr.slice().sort());
+  var fb=document.getElementById('fb-'+qid);
+  fb.className=isCorrect?'feedback show-correct':'feedback show-partial';
+  fb.textContent=(isCorrect?'Correct. ':'Not quite. ')+qdefs[qid].exp;
+  if(isCorrect)score+=qdefs[qid].pts;
+  alog[qid]={sel:selected.length>0?selected.join(', '):'None selected',correct:isCorrect,pts:isCorrect?qdefs[qid].pts:0,max:qdefs[qid].pts};
+  checkPhaseComplete();
+}
+
+function checkPhaseComplete(){
+  var qs=phaseQuestions[currentPhase]||[];
+  var allAnswered=qs.every(function(qid){return alog[qid]!==undefined;});
+  if(allAnswered){
+    var navId='nav-p'+(currentPhase+1);
+    var navEl=document.getElementById(navId);
+    if(navEl)navEl.style.display='inline-block';
+  }
+}
+
+function goPhase(n){
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-summary'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById(ids[n]).classList.add('active');
+  currentPhase=n;
+  document.querySelectorAll('.prog-seg').forEach(function(s,i){
+    s.classList.remove('done','active');
+    if(i<n)s.classList.add('done');
+    if(i===n)s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function buildSummary(){
+  var qids=['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13'];
+  var html='';
+  qids.forEach(function(qid){
+    var def=qdefs[qid];
+    var log=alog[qid];
+    var bc=log?(log.correct?'correct':'incorrect'):'partial';
+    var sc=log?(log.correct?'c':'i'):'p';
+    var st=log?(log.correct?'&#10003; Correct':'&#10007; Incorrect'):'&#8212; Not answered';
+    var ptsStr=log?(log.correct?('+'+log.max+' / '+log.max+' pts'):('0 / '+log.max+' pts')):'0 / '+def.pts+' pts';
+    var ptsCls=log&&log.correct?'style="color:var(--teal-dark);"':'style="color:var(--red);"';
+    html+='<div class="sq-block '+bc+'"><div class="sq-status '+sc+'">'+st+' <span class="sq-pts" '+ptsCls+'>'+ptsStr+'</span></div>';
+    html+='<div class="sq-question">'+def.text+'</div>';
+    if(log)html+='<div class="sq-answer"><strong>Your answer:</strong> '+(log.sel||'—')+'</div>';
+    if(!log||!log.correct){
+      html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div>';
+      html+='<div class="sq-expl">'+def.exp+'</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('summary-questions').innerHTML=html;
+  var finalScore=Math.max(0,Math.min(20,score));
+  var pct=Math.round((finalScore/20)*100);
+  var sel=document.getElementById('score-display');
+  sel.textContent=finalScore;
+  sel.className='score-big '+(pct>=70?'pass':'fail');
+  document.getElementById('score-pct-display').textContent=pct+'%';
+  document.getElementById('summary-date-display').textContent='Completed: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('phase-summary').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
+  window.scrollTo(0,0);
+}
+
+function updateName(val){document.getElementById('summary-name-display').textContent=val.trim()||'—';}
+
+document.querySelectorAll('.nav-btn.primary[id^="nav-p"]').forEach(function(btn){btn.style.display='none';});
+checkPhaseComplete();
+</script>
+</body>
+</html>
