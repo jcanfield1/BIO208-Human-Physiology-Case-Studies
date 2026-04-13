@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 3 — The Cliff | Human Physiology</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;--blue-dark:#0C447C;
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --purple:#534AB7;--purple-light:#EEEDFE;
+  --gray-bg:#f8f7f4;--gray-border:#e2e0d8;
+  --text-primary:#1a1917;--text-secondary:#5F5E5A;
+  --radius-md:8px;--radius-lg:12px;
+}
+body{font-family:Georgia,serif;background:var(--gray-bg);color:var(--text-primary);line-height:1.7;min-height:100vh;}
+.page-header{background:var(--blue-dark);color:white;padding:2rem 1.5rem 1.5rem;text-align:center;}
+.page-header .course-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.65);margin-bottom:8px;}
+.page-header h1{font-size:28px;font-weight:normal;font-style:italic;margin-bottom:6px;}
+.page-header .tagline{font-family:Arial,sans-serif;font-size:14px;color:rgba(255,255,255,.7);}
+.wrap{max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:8px;}
+.progress-bar{display:flex;gap:5px;}
+.prog-seg{flex:1;height:5px;border-radius:3px;background:var(--gray-border);transition:background .4s;}
+.prog-seg.done{background:var(--teal);}
+.prog-seg.active{background:var(--blue-mid);}
+.phase{display:none;}
+.phase.active{display:block;}
+.phase-heading{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:8px;margin-bottom:1.5rem;}
+.scene-card{background:white;border-radius:0 var(--radius-lg) var(--radius-lg) 0;border:1px solid var(--gray-border);border-left:4px solid var(--blue-mid);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.scene-card.warn{border-left-color:var(--amber);}
+.scene-card.alert{border-left-color:var(--red);}
+.scene-card.ok{border-left-color:var(--teal);}
+.scene-card.dark{border-left-color:#444;background:#fafaf8;}
+.scene-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:8px;}
+.scene-text{font-size:15px;line-height:1.75;}
+.dialogue{background:#fafaf8;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;}
+.dialogue-speaker{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;}
+.dialogue-text{font-size:15px;font-style:italic;line-height:1.65;}
+.memory-flash{background:#2c2150;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid #7F77DD;}
+.memory-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#AFA9EC;margin-bottom:8px;}
+.memory-text{font-size:15px;color:#e8e6ff;line-height:1.75;font-style:italic;}
+.sunset-scene{background:linear-gradient(135deg,#1a1410 0%,#2d1f0e 50%,#1a1917 100%);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid #EF9F27;}
+.sunset-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#FAC775;margin-bottom:8px;}
+.sunset-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.8;}
+.cliff-scene{background:#1a1917;border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid var(--red);}
+.cliff-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#f09595;margin-bottom:8px;}
+.cliff-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.8;}
+.phone-scene{background:#0c1a2e;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid var(--blue-mid);}
+.phone-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#85B7EB;margin-bottom:8px;}
+.phone-text{font-size:15px;color:rgba(255,255,255,.88);line-height:1.75;font-style:italic;}
+.consequence-screen{background:#1a1917;color:white;border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;}
+.consequence-screen h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:1rem;color:#f0c0c0;}
+.consequence-screen p{font-family:Arial,sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,.85);margin-bottom:1rem;}
+.physio-box{background:rgba(255,255,255,.08);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:1rem;}
+.physio-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.future-scene{background:#1a1917;border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;}
+.future-scene h2{font-size:20px;font-weight:normal;font-style:italic;color:#FAC775;margin-bottom:1rem;}
+.future-scene p{font-family:Arial,sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,.85);margin-bottom:1rem;}
+.question-block{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.q-tag{display:inline-block;font-family:Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:3px 9px;margin-bottom:10px;}
+.tag-mc{background:var(--blue-light);color:var(--blue-dark);}
+.tag-tf{background:var(--teal-light);color:var(--teal-dark);}
+.q-text{font-family:Arial,sans-serif;font-size:15px;font-weight:bold;line-height:1.6;margin-bottom:1rem;}
+.option-btn{display:block;width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:8px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;line-height:1.5;transition:border-color .15s,background .15s;}
+.option-btn:hover:not([disabled]){background:var(--gray-bg);border-color:#b4b2a9;}
+.option-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.option-btn.plausible{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);}
+.option-btn.ended{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.tf-wrap{display:flex;gap:10px;flex-direction:column;}
+.tf-btn{width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;line-height:1.5;}
+.tf-btn:hover:not([disabled]){background:var(--gray-bg);}
+.tf-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.tf-btn.plausible{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);}
+.tf-btn.ended{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-md);font-size:14px;font-family:Arial,sans-serif;line-height:1.6;display:none;}
+.feedback.show-correct{display:block;background:var(--teal-light);color:var(--teal-dark);}
+.feedback.show-plausible{display:block;background:var(--amber-light);color:var(--amber-dark);}
+.feedback.show-ended{display:block;background:var(--red-light);color:var(--red);}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--gray-border);}
+.nav-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 24px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.nav-btn:hover:not([disabled]){background:var(--gray-bg);}
+.nav-btn[disabled]{opacity:.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);color:white;border-color:var(--blue);}
+.nav-btn.primary:hover{background:var(--blue-dark);}
+.summary-header{background:var(--blue-dark);color:white;border-radius:var(--radius-lg);padding:1.75rem 1.5rem;text-align:center;margin-bottom:1.5rem;}
+.summary-header h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:4px;}
+.summary-header p{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.75);}
+.score-banner{display:flex;align-items:center;justify-content:center;gap:2rem;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-block{text-align:center;}
+.score-big{font-size:52px;font-family:Arial,sans-serif;font-weight:bold;line-height:1;}
+.score-big.pass{color:var(--teal);}
+.score-big.fail{color:var(--red);}
+.score-label{font-family:Arial,sans-serif;font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.score-divider{width:1px;height:60px;background:var(--gray-border);}
+.outcome-badge{display:inline-block;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:var(--radius-md);padding:6px 16px;}
+.outcome-badge.completed{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--teal);}
+.outcome-badge.ended{background:var(--red-light);color:var(--red);border:1px solid var(--red);}
+.outcome-badge.partial{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}
+.stamp-block{border:2px solid var(--teal);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;margin-bottom:1.5rem;background:var(--teal-light);}
+.stamp-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-dark);margin-bottom:6px;}
+.stamp-name{font-size:22px;color:var(--teal-dark);margin-bottom:4px;}
+.stamp-date{font-family:Arial,sans-serif;font-size:13px;color:var(--teal-dark);}
+.name-input-row{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;}
+.name-input-row label{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;}
+.name-input-row input{width:100%;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 12px;font-size:15px;font-family:Georgia,serif;color:var(--text-primary);background:white;}
+.name-input-row input:focus{outline:none;border-color:var(--blue-mid);}
+.submit-instructions{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-family:Arial,sans-serif;font-size:14px;color:var(--amber-dark);line-height:1.7;}
+.summary-section{margin-bottom:1.75rem;}
+.summary-section-title{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:6px;margin-bottom:1rem;}
+.sq-block{border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:10px;background:white;}
+.sq-block.correct{border-left:4px solid var(--teal);}
+.sq-block.incorrect{border-left:4px solid var(--red);}
+.sq-block.partial{border-left:4px solid var(--amber);}
+.sq-block.notreached{border-left:4px solid var(--gray-border);background:#fafaf8;}
+.sq-status{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sq-status.c{color:var(--teal-dark);}
+.sq-status.i{color:var(--red);}
+.sq-status.p{color:var(--amber-dark);}
+.sq-status.n{color:var(--text-secondary);}
+.sq-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;float:right;}
+.sq-question{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;}
+.sq-answer{font-family:Arial,sans-serif;font-size:14px;margin-bottom:4px;}
+.sq-correct-ans{color:var(--teal-dark);}
+.sq-expl{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:8px;border-top:.5px solid var(--gray-border);padding-top:8px;}
+.locked-notice{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius-md);padding:10px 14px;font-family:Arial,sans-serif;font-size:13px;color:var(--red);text-align:center;margin-bottom:1.5rem;}
+@media print{
+  .page-header,.progress-wrap,.nav-row,.submit-instructions,.name-input-row,.locked-notice{display:none!important;}
+  .phase{display:none!important;}
+  #phase-summary{display:block!important;}
+  body{background:white;}
+  .summary-header,.stamp-block{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Human Physiology — Undergraduate Nursing | Case Study 3 of 5</div>
+  <h1>The Cliff</h1>
+  <div class="tagline">Two medical school graduates on a trip to reset. One of them is carrying something he doesn't fully know about yet.</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your progress — choose wisely. Some decisions cannot be undone.</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+      <div class="prog-seg" id="ps6"></div>
+      <div class="prog-seg" id="ps7"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 0 — OPENING -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">Durmitor National Park, Montenegro &nbsp;—&nbsp; Day 9 of the trip</div>
+    <div class="scene-card">
+      <div class="scene-label">Where you are</div>
+      <div class="scene-text">You are Kevin Chen, 26, freshly graduated from medical school. You want to specialize in rare diagnostic medicine — the cases nobody can figure out, the ones that sit in charts for years before someone finally sees the pattern. You and your best friend Andrew Hale have been traveling for nine days through the Balkans. Croatia first, then Bosnia, now Montenegro. The plan was simple: stop thinking about medicine for a month. Stop thinking about residency applications and shelf exams and what comes next. Just be somewhere extraordinary and let the pressure out.</div>
+    </div>
+    <div class="scene-card ok">
+      <div class="scene-label">The monastery complex — morning</div>
+      <div class="scene-text">You have joined a small guided tour of the Ostrog Monastery complex, carved directly into a white limestone cliff face two thousand feet above the Zeta River valley. The view from the upper terrace is genuinely staggering — canyon walls, pine forests, a river that looks silver from this height. The other travelers on the tour are a mix of Europeans and backpackers. Marco Rossi, 26, an Italian long-distance runner. Dani Voss, 24, a German rock climber. Priya Nair, 27, a British ecology graduate student. A few others. Good people. The kind of travelers who move through the world quietly and carefully.</div>
+    </div>
+    <div class="scene-card warn">
+      <div class="scene-label">The climb up — 10:40 AM</div>
+      <div class="scene-text">The path to the upper monastery is steep and uneven — carved stone steps, some sections just packed earth. The morning is warm for October. You and Andrew have your packs on. Andrew sets a fast pace the way he always does, first up everything, competitive even when there is nothing to compete for. About two thirds of the way up, you notice him slow. His right hand goes briefly to his chest — just for a second, almost a gesture. He keeps moving immediately. His breathing is harder than the climb seems to warrant. He does not say anything.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 1 — First Subtle Symptom &nbsp;|&nbsp; <span style="color:var(--amber-dark);">2 points</span></div>
+      <div class="q-text">Q1. You notice Andrew's hand go briefly to his chest and his breathing is harder than the climb warrants. He does not acknowledge it. What do you do?</div>
+      <button class="option-btn" onclick="b1(this,'A')">A. You say nothing in the moment but mentally flag it — hand to chest, disproportionate breathlessness on exertion — and make a note to watch for it again</button>
+      <button class="option-btn" onclick="b1(this,'B')">B. You call out to him and ask if he is okay — he waves you off and says he is fine, just out of shape. You accept this and move on</button>
+      <button class="option-btn" onclick="b1(this,'C')">C. You are breathing hard too and put it down to the altitude and the heavy packs — you both have been sedentary for months. You think nothing more of it</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p1" onclick="goPhase(1)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 — THE CONVERSATION -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Outside the upper monastery &nbsp;—&nbsp; 6:20 PM</div>
+    <div class="sunset-scene">
+      <div class="sunset-label">The view at the end of the day</div>
+      <div class="sunset-text">The tour group has mostly gone back down. You and Andrew are sitting on a low stone wall outside the upper chapel, backs against warm limestone, watching the light go out of the canyon. The Zeta valley is filling with shadow. The river is invisible now, just a sound far below. You have been here for twenty minutes not saying very much. After nine months of clinical rotations and board exams and twelve-hour days on wards where everything felt urgent, the silence is almost disorienting.<br><br>Andrew has his elbows on his knees, turning his water bottle in his hands. You know him well enough to know when he is about to say something real.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Andrew Hale</div>
+      <div class="dialogue-text">"Can I ask you something? What are you actually afraid of? Not residency stuff. Not the Match. Actually afraid of."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"That I chose the wrong thing. That I spent six years becoming something I don't actually want to be."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Andrew Hale</div>
+      <div class="dialogue-text">"Yeah." He is quiet for a moment. "I keep waiting to feel like a doctor. Like something clicked. It hasn't yet."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"Maybe it clicks when someone actually needs you."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Andrew Hale</div>
+      <div class="dialogue-text">"Maybe." He takes a long drink of water. Then, offhandedly, the way you mention things you have been carrying for a while: "Hey — you ever just feel your heart do something weird? Like a flutter. Just for a second and then it's gone."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"Sometimes. Yeah. Why?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Andrew Hale</div>
+      <div class="dialogue-text">"I don't know. It happens sometimes. Not often. I read something once in Braunwald's — one of those conditions they describe as underdiagnosed in young people. I remember thinking it was interesting. But it always passes. It's probably nothing. We've been running on four hours of sleep and bad coffee for six years — everything feels weird."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"True. I had palpitations all through third year. Thought I was developing every condition I was studying."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 2 — The Conversation &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q2. Andrew has just told you, casually, that he experiences cardiac flutter and mentioned reading about an underdiagnosed condition in young people. You feel palpitations too and the stress explanation is genuinely plausible. What do you do?</div>
+      <button class="option-btn" onclick="b2(this,'A')">A. You push gently — ask him to describe exactly what the flutter feels like, when it tends to happen, whether it is ever accompanied by lightheadedness or chest tightness. You want the clinical picture even if it turns out to be nothing</button>
+      <button class="option-btn" onclick="b2(this,'B')">B. You tell him you have had the same thing and it is almost certainly stress-related — six years of medical school does strange things to the autonomic nervous system. You both laugh and let it go</button>
+      <button class="option-btn" onclick="b2(this,'C')">C. You make a mental note that he mentioned it but do not press — he seems unbothered and you do not want to turn a good moment into a clinical interview. You will ask later if it comes up again</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <div id="b2-andrew-response" style="display:none;">
+      <div class="dialogue" style="margin-top:1rem;">
+        <div class="dialogue-speaker">Andrew Hale — after you press him</div>
+        <div class="dialogue-text">"Mostly when I'm doing something physical. Climbing, running. Sometimes it comes with this weird dizzy feeling — like the world tilts for a second. Maybe twice a year, maybe less. I always just waited for it to pass and it did. I figured if it was serious it would have shown up by now."</div>
+      </div>
+      <div class="memory-flash">
+        <div class="memory-label">Kevin's clinical memory — exertion-related palpitations with presyncope</div>
+        <div class="memory-text">Exertion-triggered. Brief. Accompanied by dizziness. Happens and then resolves. You are two years out from your cardiology rotation and the words surface slowly — outflow obstruction, ventricular hypertrophy, dynamic obstruction that worsens with exertion and dehydration. Young people. Often asymptomatic for years. You remember a sentence about it being the leading cause of sudden cardiac death in athletes under 35. You file it. You do not say it out loud. It is probably nothing. It has always been nothing. But you file it.</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p2" onclick="goPhase(2)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — THE COLLAPSE -->
+  <div id="phase-2" class="phase">
+    <div class="phase-heading">The cliff ledge &nbsp;—&nbsp; next morning, 9:55 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">Off the path</div>
+      <div class="scene-text">The tour group is inside the lower monastery chapel. You and Andrew have wandered away — further than you should have — along a narrow path that runs outside the main complex and eventually gives way to bare limestone shelf. There is no railing. The cliff drops away on your left into the canyon several hundred feet below. The view is extraordinary. Andrew is ahead of you, photographing a carved stone cross embedded directly into the rock face, leaning slightly over the edge to get the angle.</div>
+    </div>
+    <div class="cliff-scene">
+      <div class="cliff-label">9:57 AM — the collapse</div>
+      <div class="cliff-text">Andrew straightens up from the shot. He turns toward you. His expression changes — not pain exactly, more like confusion, like he has forgotten what he was about to say. He puts his hand out toward the rock face. Then his legs go and he is on the ground.<br><br>He does not fall off the ledge. He slides down against the cliff face and lands on his side on the narrow shelf of rock, maybe eighteen inches from the drop. He is breathing. You can see his chest moving. But he is unconscious.<br><br>The tour group is inside a stone building out of earshot. Your phone has one bar. The path back is rough and uneven. You are alone with him on a ledge on a cliff face in Montenegro and your best friend is unconscious on the ground.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 3 — Immediate Response &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q3. Andrew is unconscious on a narrow cliff ledge eighteen inches from a several-hundred-foot drop. He is breathing. What is your immediate action?</div>
+      <button class="option-btn" onclick="b3(this,'A')">A. Stay with him. Do not move him. Check his airway, his breathing, and his pulse. Move him only enough — very carefully — to ensure he cannot roll toward the edge. Shout for help and use your phone to call emergency services while staying at his side</button>
+      <button class="option-btn" onclick="b3(this,'B')">B. Carefully prop him sitting upright against the cliff face — lying flat on a narrow ledge near a drop feels dangerous — then call for help</button>
+      <button class="option-btn" onclick="b3(this,'C')">C. The ledge is too dangerous — get him off it immediately. You grab him under the arms and start moving him back along the path toward the monastery</button>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p3" onclick="goPhase(3)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 — MOVING ANDREW -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">The cliff ledge &nbsp;—&nbsp; 10:08 AM</div>
+
+    <div id="b3-consequence" style="display:none;">
+      <div class="scene-card warn">
+        <div class="scene-label">Consequence of sitting Andrew upright</div>
+        <div class="scene-text">Andrew comes around briefly when you sit him up — his eyes open, he says your name — but almost immediately his colour drains and he loses consciousness again. In hypertrophic cardiomyopathy, sitting upright reduces venous return to the heart, which decreases left ventricular filling volume. In a heart with thickened walls and dynamic outflow obstruction, reduced filling worsens obstruction and can trigger further arrhythmia. His body is telling you clearly: flat is better than upright. You lay him back down carefully. You have cost him time and stability. The other travelers are arriving now.</div>
+      </div>
+    </div>
+
+    <div class="scene-card">
+      <div class="scene-label">Help arrives</div>
+      <div class="scene-text">Priya Nair heard you shouting and came first, moving fast and carefully along the narrow path. Marco and Dani are behind her. They stop when they see Andrew on the ground. Marco goes pale. Dani immediately looks at the terrain — she is a climber, she is reading the rock, thinking about how to move someone off it. Priya crouches beside you. Her Montserrat university hoodie says she is from London. She speaks clear English.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Priya Nair</div>
+      <div class="dialogue-text">"What happened? Did he fall?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"He collapsed. No fall. He has a cardiac history — I think. I need to get him off this ledge and to a hospital but I need to move him carefully. Very carefully."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dani Voss</div>
+      <div class="dialogue-text">"I have a first aid kit in my pack. And I know how to move someone on bad terrain. Tell me what you need."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 4 — Moving Andrew &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q4. You have Dani, Marco, and Priya available to help. Andrew needs to be moved off the cliff ledge and down to the main path where a vehicle can reach. How do you direct them to move him?</div>
+      <button class="option-btn" onclick="b4(this,'A')">A. Slow and flat — Andrew stays as horizontal as possible throughout the move. Dani guides the feet and terrain, Marco and you support his torso, Priya monitors his breathing and pulse. No rushing. You tell them the goal is to minimize any physical stress on his cardiovascular system</button>
+      <button class="option-btn" onclick="b4(this,'B')">B. Marco and Dani are physically the strongest — have them carry Andrew between them as quickly as possible to get him off the dangerous terrain and down to where a vehicle can reach. Speed matters more than method right now</button>
+      <button class="option-btn" onclick="b4(this,'C')">C. Andrew has regained partial consciousness — have him walk with support between two people. Getting him moving under his own power will be faster and less disruptive than carrying him</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p4" onclick="goPhase(4)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 — THE PHONE CALLS -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">The main path below the monastery &nbsp;—&nbsp; 10:41 AM</div>
+    <div class="scene-card ok">
+      <div class="scene-label">Off the cliff</div>
+      <div class="scene-text">Andrew is off the ledge. Priya found a local man with a truck who is willing to drive — she negotiated it in halting Montenegrin and hand gestures and sheer determination. The nearest hospital with a cardiology department is in Nikšić, about forty minutes away on mountain roads. Andrew is conscious now, confused, frightened. He is asking what happened. You tell him he fainted. You do not say what you are thinking yet.</div>
+    </div>
+    <div id="b4-consequence" style="display:none;">
+      <div class="scene-card warn">
+        <div class="scene-label">Consequence of the rushed move</div>
+        <div class="scene-text">The fast carry caused Andrew to regain consciousness abruptly in the middle of the move and become agitated and physically resistant, which spiked his heart rate and triggered a second brief syncopal episode. He is now conscious again but visibly more unstable — pale, diaphoretic, heart rate irregular. He will arrive at hospital in a worse state than he needed to. You have made the road ahead harder.</div>
+      </div>
+    </div>
+    <div class="phone-scene">
+      <div class="phone-label">Kevin's phone — 10:44 AM</div>
+      <div class="phone-text">You try Andrew's parents. Thomas Hale — straight to voicemail. Susan Hale — same. You try twice more. Nothing. You stare at the phone for a moment and then call your father.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Robert Chen — Kevin's father</div>
+      <div class="dialogue-text">"Kevin? What's wrong — your mother said you called three times."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"Dad. Andrew collapsed. We're in Montenegro. I think it's cardiac. I can't reach his parents."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Robert Chen</div>
+      <div class="dialogue-text">"Okay. I'm listening. Tell me exactly what happened — symptoms, timeline, everything you observed. Your mother is already getting Thomas and Susan's number."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 5 — The Phone Call &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q5. Your father has asked you to tell him exactly what happened. How do you respond?</div>
+      <button class="option-btn" onclick="b5(this,'A')">A. You give him a systematic clinical account — exertion-related palpitations noted yesterday on the climb, a brief conversation last evening where Andrew described flutter with occasional lightheadedness on exertion, this morning's syncopal episode with no preceding trauma, current vitals, and your working hypothesis. You ask him to make sure Andrew's parents know to think about family cardiac history when they call</button>
+      <button class="option-btn" onclick="b5(this,'B')">B. You describe what happened on the cliff — the collapse, the ledge, getting him down — and tell your father you are heading to a hospital in Nikšić. You are emotional and the clinical details come out scattered. Your father stays calm and helps you organize the logistics</button>
+      <button class="option-btn" onclick="b5(this,'C')">C. You tell him Andrew fainted and you are taking him to hospital and you need him to reach Andrew's parents. You keep it brief because you are focused on Andrew and you do not want to be on the phone long</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p5" onclick="goPhase(5)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — FAMILY HISTORY -->
+  <div id="phase-5" class="phase">
+    <div class="phase-heading">In the truck, heading toward Nikšić &nbsp;—&nbsp; 11:02 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">The road</div>
+      <div class="scene-text">The truck is moving. Andrew is lying in the flatbed with his head in your lap. Dani is with you. Marco is in the cab helping with directions. Priya stayed behind to coordinate with the monastery and handle the tour operator. The mountain road switchbacks down through pine forest. Your phone rings. It is your father — and Thomas Hale is on the line.</div>
+    </div>
+    <div class="phone-scene">
+      <div class="phone-label">Thomas Hale — Andrew's father — speaking fast</div>
+      <div class="phone-text">"Kevin — my God — is he breathing, is he okay right now — Susan, he's talking to Kevin — sorry, we just landed in Heathrow, we've been on a plane for nine hours, we had no signal — what happened exactly, is he conscious, Andrew was always healthy, always, he never — listen, he had a physical two years ago, everything was normal — Susan stop, I'm trying to — his uncle David, my brother, he died playing football, thirty-one years old, they said it was his heart but we never really understood what that meant, we didn't push, we should have pushed — is that relevant, does that matter, Kevin tell me if that matters."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 6 — The Family History &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q6. Thomas Hale has just told you, almost in passing, that Andrew's uncle David died at 31 of an unexplained cardiac event during physical activity. How do you interpret this information?</div>
+      <button class="option-btn" onclick="b6(this,'A')">A. It matters enormously. Hypertrophic cardiomyopathy follows an autosomal dominant inheritance pattern — a first-degree relative dying young of an unexplained cardiac event during exertion is a classic red flag. This confirms your working diagnosis and changes how you will communicate with the hospital team. You tell Thomas yes — it matters very much — and ask him to write down everything he remembers about David's death</button>
+      <button class="option-btn" onclick="b6(this,'B')">B. It is potentially relevant — a young relative dying of cardiac causes during exercise is a flag — but you do not want to alarm Thomas further before you have a confirmed diagnosis. You note it mentally and move on to reassuring him about Andrew's current status</button>
+      <button class="option-btn" onclick="b6(this,'C')">C. It is probably unrelated — Andrew's physical two years ago was normal, and a single unexplained family death decades ago is not necessarily hereditary. You focus the call on logistics and reassuring the family</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p6" onclick="goPhase(6)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 6 — HOSPITAL ADVOCACY -->
+  <div id="phase-6" class="phase">
+    <div class="phase-heading">General Hospital Nikšić &nbsp;—&nbsp; 11:48 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">Arrival</div>
+      <div class="scene-text">The hospital is a concrete building on the edge of a small city surrounded by mountains. The emergency staff speak very limited English — a junior nurse finds a colleague who can translate roughly. Andrew is on a gurney. He is conscious and frightened. A doctor — Dr. Milović, 50s, experienced — is examining him. She looks up at you with a question in her expression. She wants the history.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Milović — through the translating nurse</div>
+      <div class="dialogue-text">"You were with him. Tell me what you saw."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 7 — Hospital Advocacy &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q7. Dr. Milović is asking for the history. You are a medical school graduate with a specific working diagnosis and a clear clinical picture. How do you respond?</div>
+      <button class="option-btn" onclick="b7(this,'A')">A. You give her the full picture clearly and directly — exertion-related palpitations with presyncope on multiple prior occasions, today's syncopal episode during physical activity, family history of sudden cardiac death in a first-degree relative during exertion at age 31. You tell her your working diagnosis is hypertrophic cardiomyopathy and you are requesting a 12-lead ECG and echocardiogram to confirm. You advocate for Andrew even though you are not the treating physician</button>
+      <button class="option-btn" onclick="b7(this,'B')">B. You describe the collapse and the symptoms as clearly as you can through the translator, but you do not name a diagnosis — you do not want to overstep or be wrong in front of an experienced physician. You provide the facts and let her draw her own conclusions</button>
+      <button class="option-btn" onclick="b7(this,'C')">C. You defer to Dr. Milović entirely — she is the physician, this is her hospital, and you are a foreign medical graduate with no standing here. You answer her direct questions but do not volunteer additional clinical reasoning or advocate for specific tests</button>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p7" onclick="goPhase(7)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 7 — RESOLUTION -->
+  <div id="phase-7" class="phase">
+    <div class="phase-heading">General Hospital Nikšić &nbsp;—&nbsp; 3:15 PM</div>
+    <div class="scene-card ok">
+      <div class="scene-label">The diagnosis</div>
+      <div class="scene-text">The ECG showed left ventricular hypertrophy with asymmetric septal thickening. The echocardiogram confirmed it — hypertrophic cardiomyopathy with dynamic left ventricular outflow tract obstruction. Dr. Milović finds you in the waiting room. Her English, it turns out, is better than she let on.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Milović</div>
+      <div class="dialogue-text">"Your friend has a condition he has had since birth. His heart muscle is too thick — here, in the wall between the chambers. When he exerts himself, when his heart beats fast and hard, the thickened wall can obstruct blood leaving the heart. This causes the dizziness. The palpitations. Today, the syncope. He was lucky. You were lucky you did not move him quickly." She pauses. "You knew what to look for."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Kevin Chen — You</div>
+      <div class="dialogue-text">"I wasn't sure. I had a hypothesis."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dr. Milović</div>
+      <div class="dialogue-text">"In medicine, a good hypothesis at the right moment is worth more than certainty that arrives too late."</div>
+    </div>
+    <div class="scene-card ok">
+      <div class="scene-label">What happens next</div>
+      <div class="scene-text">Andrew is started on beta-blockers to reduce the obstruction and prevent arrhythmia. He is stable. Thomas and Susan Hale are on a flight to Podgorica. In four days Andrew will be cleared to fly home under medical supervision. He will be referred to a specialist in Boston. The diagnosis changes his life — no competitive athletics, regular cardiac monitoring, a conversation he will need to have with his future patients about family history. But he is alive. He is diagnosed. And the trip, Andrew says from his hospital bed with an IV in his arm and a heart monitor beeping beside him, was still worth it.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">Physiological Understanding &nbsp;|&nbsp; <span style="color:var(--amber-dark);">2 points</span></div>
+      <div class="q-text">Q8. Hypertrophic cardiomyopathy caused Andrew's syncopal episode because the thickened interventricular septum created dynamic outflow tract obstruction — meaning the obstruction worsens with increased heart rate, decreased ventricular filling volume, and physical exertion, all of which occurred simultaneously on the cliff.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="b8(this,'A',true)">True — dynamic obstruction in HCM is worsened by exactly these conditions: tachycardia reduces filling time, dehydration reduces ventricular volume, and exertion increases contractility, all of which together can reduce cardiac output enough to cause syncope</button>
+        <button class="tf-btn" onclick="b8(this,'B',false)">False — HCM causes fixed obstruction that does not change with physiological conditions and would have caused symptoms regardless of activity level or hydration status</button>
+      </div>
+      <div class="feedback" id="fb-q8"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-summary" onclick="buildSummary(null)" style="display:none;">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY PAGE -->
+  <div id="phase-summary" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers and score cannot be changed.</div>
+    <div class="summary-header">
+      <h2>Case Study 3 — Submission Summary</h2>
+      <p>Human Physiology &nbsp;|&nbsp; BIO 208 &nbsp;|&nbsp; The Cliff</p>
+    </div>
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-display">—</div>
+        <div class="score-label">Points earned</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div style="font-size:28px;font-family:Arial,sans-serif;font-weight:bold;" id="score-pct-display">—</div>
+        <div class="score-label">Out of 20</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div id="outcome-label" class="outcome-badge">—</div>
+      </div>
+    </div>
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment.
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">All decisions — your complete path through the case</div>
+      <div id="summary-questions"></div>
+    </div>
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Case study locked and complete</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var score=0;
+var scenarioEnded=false;
+var b3wrong=false;
+var b4wrong=false;
+var alog={};
+
+var qdefs={
+  q1:{text:'Q1. You notice Andrew\'s hand go briefly to his chest on the climb. What do you do?',pts:2,
+    cl:'A — Mentally flag it without breaking the moment — hand to chest, disproportionate breathlessness on exertion — and watch for recurrence',
+    exp:'Exertion-related symptoms that a patient does not acknowledge are often the most clinically significant. The correct response is to observe carefully, file the detail, and watch for a pattern. Pressing in the moment may cause dismissal. Ignoring it entirely loses a critical early data point. Active silent observation is a core diagnostic skill.'},
+  q2:{text:'Q2. Andrew mentions cardiac flutter with occasional lightheadedness on exertion. You feel palpitations too. What do you do?',pts:3,
+    cl:'A — Press gently for a full clinical description — when it happens, what it feels like, whether it accompanies exertion, whether it comes with lightheadedness',
+    exp:'Andrew has just handed you a clinical history without realizing it. Exertion-triggered palpitations with presyncope in a young person are never simply dismissed in a thorough clinical assessment. The stress explanation is plausible but should not substitute for a proper characterization. Obtaining the clinical picture now, when Andrew is calm and communicative, is far better than waiting for a crisis.'},
+  q3:{text:'Q3. Andrew is unconscious on a cliff ledge eighteen inches from a drop. What is your immediate action?',pts:3,
+    cl:'A — Stay with him, keep him still, assess airway and breathing and pulse, move him minimally to prevent rolling toward the edge, call for help',
+    exp:'In a suspected cardiac syncopal episode, the immediate priority is airway and circulation assessment — not movement. In hypertrophic cardiomyopathy, sudden movement, physical jostling, and the catecholamine surge from rushed activity can worsen dynamic outflow obstruction or trigger arrhythmia. The physical danger of the ledge must be balanced against the physiological danger of movement. Minimal repositioning to prevent a fall is appropriate; rushing to move him is not.'},
+  q4:{text:'Q4. How do you direct the group to move Andrew off the cliff ledge?',pts:3,
+    cl:'A — Slow and flat, Andrew as horizontal as possible throughout, no rushing, cardiovascular stress minimized at every step',
+    exp:'In HCM with dynamic outflow tract obstruction, the goal during transport is to maintain adequate left ventricular filling volume and minimize catecholamine release from exertion or agitation. Horizontal positioning preserves venous return. Slow movement prevents the physical stress that worsens obstruction. Any transport method that prioritizes speed over cardiovascular stability risks triggering another — potentially worse — arrhythmic episode.'},
+  q5:{text:'Q5. Your father asks you to tell him exactly what happened. How do you respond?',pts:3,
+    cl:'A — A systematic clinical account: prior symptoms, the conversation last evening, this morning\'s syncopal episode, current vitals, working hypothesis, and a specific request to ask Andrew\'s parents about family cardiac history',
+    exp:'This phone call is the first opportunity to activate the information network that will confirm the diagnosis. A systematic clinical account gives your father the right questions to ask Andrew\'s parents. Specifically flagging family cardiac history is critical because HCM follows an autosomal dominant pattern — the family history may be the single most confirming piece of information available before hospital diagnostics. Disorganized or minimal communication delays this.'},
+  q6:{text:'Q6. Thomas Hale mentions his brother died at 31 of an unexplained cardiac event during physical activity. How do you interpret this?',pts:3,
+    cl:'A — It matters enormously. HCM is autosomal dominant. A first-degree relative dying young of an unexplained exertion-related cardiac event is a classic red flag that confirms the working diagnosis',
+    exp:'Hypertrophic cardiomyopathy is inherited in an autosomal dominant pattern — approximately 50% of first-degree relatives of an affected individual carry the same mutation. A parent\'s sibling dying suddenly during physical activity at 31 with no confirmed diagnosis is a textbook unrecognized HCM death. This single piece of family history transforms Kevin\'s working hypothesis into a highly probable diagnosis and should immediately change his communication with the hospital team.'},
+  q7:{text:'Q7. Dr. Milović asks for the history. How do you communicate with her?',pts:3,
+    cl:'A — Full clinical picture, working diagnosis named, specific diagnostic tests requested. Advocate for Andrew clearly and directly',
+    exp:'A patient advocate with medical knowledge has both the right and the responsibility to communicate a clinical picture clearly to the treating team. Deferring entirely or withholding a working diagnosis out of misplaced modesty deprives the treating physician of information that could accelerate the correct diagnosis. Naming HCM and requesting ECG and echocardiogram does not overstep — it contributes. An experienced physician like Dr. Milović will evaluate the suggestion on its merits.'},
+  q8:{text:'Q8. HCM caused syncope because dynamic obstruction worsens with tachycardia, reduced ventricular filling, and exertion simultaneously. (T/F)',pts:2,
+    cl:'True — dynamic obstruction in HCM is worsened by exactly these conditions together',
+    exp:'HCM obstruction is dynamic — meaning it changes with physiological conditions. Tachycardia reduces the time available for ventricular filling between beats. Dehydration reduces total filling volume. Exertion increases myocardial contractility and heart rate simultaneously. When all three occur together — as they did during a steep morning climb after limited overnight hydration — the obstruction becomes severe enough to dramatically reduce cardiac output, causing cerebral hypoperfusion and syncope. This is precisely why exertion is the classic trigger for HCM events.'}
+};
+
+function lockBtns(parent,sel){parent.querySelectorAll(sel).forEach(function(b){b.disabled=true;});}
+
+function b1(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q1');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Good clinical instinct. You have filed a data point without losing it. That detail — exertion-triggered, accompanied by disproportionate breathlessness — will become important. +2 points.';
+    score+=2;alog.q1={sel:'A — Mentally flagged the symptom and watched for recurrence',correct:true,pts:2,max:2};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Checking on him is not wrong, but accepting his dismissal without pressing closes the door on the observation. You have the data point but it is softer now — he said he was fine, and that is what you registered. -2 points.';
+    score=Math.max(0,score-2);alog.q1={sel:'B — Asked if he was okay, accepted his dismissal',correct:false,pts:-2,max:2,plausible:true};
+  } else {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Your own breathlessness made it easy to normalize his. It is a genuinely plausible explanation. But you have lost a clinical observation that could have changed how you interpret what comes next. -2 points.';
+    score=Math.max(0,score-2);alog.q1={sel:'C — Attributed it to deconditioning and moved on',correct:false,pts:-2,max:2,plausible:true};
+  }
+  document.getElementById('nav-p1').style.display='inline-block';
+}
+
+function b2(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q2');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. You have just obtained a proper exertional symptom history. Exertion-triggered, with presyncope, recurring over years. That clinical picture is now in your hands. +3 points.';
+    score+=3;
+    document.getElementById('b2-andrew-response').style.display='block';
+    alog.q2={sel:'A — Pressed for full clinical description of the flutter and when it occurs',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='The stress explanation is genuinely plausible and your shared experience made it feel true. But you have just accepted an incomplete history and foreclosed a diagnostic opportunity. You will reach the hospital with less clinical context than you needed. -2 points.';
+    score=Math.max(0,score-2);alog.q2={sel:'B — Accepted the stress explanation because you felt it too',correct:false,pts:-2,max:3,plausible:true};
+  } else {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Not pressing in the moment was understandable — you did not want to be the friend who turns every conversation into a clinical interview. But you did not follow up, and the history was never obtained. -2 points.';
+    score=Math.max(0,score-2);alog.q2={sel:'C — Made a mental note but did not press, planned to ask later',correct:false,pts:-2,max:3,plausible:true};
+  }
+  document.getElementById('nav-p2').style.display='inline-block';
+}
+
+function b3(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q3');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. You have secured his airway, confirmed he is breathing, kept him still, and called for help without introducing the physiological stress of movement. This is exactly right. +3 points.';
+    score+=3;alog.q3={sel:'A — Stayed, assessed, kept still, called for help',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    b3wrong=true;
+    fb.className='feedback show-plausible';
+    fb.textContent='The instinct to get him upright away from the edge is understandable, but in HCM sitting upright reduces venous return, which worsens dynamic outflow obstruction. Andrew briefly regained then lost consciousness again. You will see the consequence in the next phase. -1 point.';
+    score=Math.max(0,score-1);alog.q3={sel:'B — Propped Andrew sitting upright against the cliff face',correct:false,pts:-1,max:3,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Moving Andrew immediately without assessment triggered a serious arrhythmic episode. He lost consciousness again and is now critically unstable. Emergency services were called and took over. You lost your role as decision-maker. Scenario ended.';
+    alog.q3={sel:'C — Attempted to move Andrew immediately off the ledge',correct:false,pts:0,max:3,ended:true};
+    endScenario('Attempting to physically move an unconscious patient with suspected cardiac pathology without first assessing airway, breathing, and circulation — and without understanding the physiological stakes of that movement — is a critical error. In HCM, sudden exertion and catecholamine release from physical stress can convert a recoverable syncopal episode into a life-threatening arrhythmia. The correct initial response is always: stop, assess, stabilize, then move carefully with full understanding of the risks.');
+    return;
+  }
+  document.getElementById('nav-p3').style.display='inline-block';
+}
+
+function b4(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q4');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. Slow, flat, and cardiovascularly stable. You have used the resources available to you — Dani\'s terrain knowledge, Marco\'s strength — in the way that best protects Andrew\'s heart. +3 points.';
+    score+=3;alog.q4={sel:'A — Slow and flat, cardiovascular stress minimized throughout',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='The fast carry caused Andrew to regain consciousness in the middle of the move and become agitated, spiking his heart rate and triggering a second syncopal episode. He is now critically unstable. Emergency services took over. Scenario ended.';
+    alog.q4={sel:'B — Fast carry by the two strongest people to get him off the terrain quickly',correct:false,pts:0,max:3,ended:true};
+    endScenario('Speed during transport of a suspected HCM patient is dangerous. Physical agitation, sudden movement, and the catecholamine surge from being jostled can worsen dynamic outflow obstruction dramatically. The goal is never to move quickly — it is to move safely, horizontally, with cardiovascular stability maintained at every step. Prioritizing terrain speed over physiological safety cost Andrew a second cardiac event and cost you your role as the person who understood what was happening to him.');
+    return;
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Having Andrew walk under his own power immediately after a syncopal episode with suspected HCM is a critical error. Physical exertion is the primary trigger for HCM obstruction. He collapsed again within thirty seconds and had to be carried by emergency services. Scenario ended.';
+    alog.q4={sel:'C — Had Andrew walk with support between two people',correct:false,pts:0,max:3,ended:true};
+    endScenario('A patient who has just experienced a syncopal episode secondary to suspected exertional cardiac pathology must not be asked to walk. Exertion is the primary trigger for dynamic outflow obstruction in HCM. Even supported walking introduces exactly the physiological conditions — increased heart rate, increased contractility, reduced filling time — that caused the original episode. The correct approach is passive transport in a horizontal position with cardiovascular stress minimized throughout.');
+    return;
+  }
+  document.getElementById('b4-consequence').style.display='none';
+  document.getElementById('nav-p4').style.display='inline-block';
+}
+
+function b5(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q5');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. You have used this call to activate the diagnostic chain. Your father now knows to specifically ask Thomas and Susan about family cardiac history — and you have framed the working hypothesis in a way that primes that question. +3 points.';
+    score+=3;alog.q5={sel:'A — Systematic clinical account with working hypothesis and specific request about family cardiac history',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Your father helped you organize the logistics and the family was reached. But the clinical picture was disorganized and the specific prompt about family cardiac history was not clearly communicated. Thomas Hale will mention his brother — but it will come out more by chance than because you asked for it. -1 point.';
+    score=Math.max(0,score-1);alog.q5={sel:'B — Emotional account of the cliff, logistics focused, clinical details scattered',correct:false,pts:-1,max:3,plausible:true};
+  } else {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Keeping it brief meant your father had less to work with when reaching Andrew\'s parents. The family history will still emerge but without the framing that would make Thomas Hale understand why it matters. -1 point.';
+    score=Math.max(0,score-1);alog.q5={sel:'C — Brief update, logistics only, no clinical framing',correct:false,pts:-1,max:3,plausible:true};
+  }
+  document.getElementById('nav-p5').style.display='inline-block';
+}
+
+function b6(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q6');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. You have connected the autosomal dominant inheritance pattern of HCM to this specific family history and recognized it as confirmation of your working diagnosis. This will change everything about how you walk into that hospital. +3 points.';
+    score+=3;alog.q6={sel:'A — Recognized the autosomal dominant significance immediately, asked for more detail',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Noting it without fully connecting it to the inheritance pattern was a missed opportunity. You arrive at the hospital with a weaker clinical argument than the evidence supports. -2 points.';
+    score=Math.max(0,score-2);alog.q6={sel:'B — Noted it as potentially relevant but did not connect it to inheritance pattern',correct:false,pts:-2,max:3,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Dismissing the family history as unrelated means you arrive at the hospital without your most important diagnostic piece. Andrew is treated for a nonspecific syncopal episode and discharged without a confirmed diagnosis. Scenario ended.';
+    alog.q6={sel:'C — Dismissed it as likely unrelated, focused on logistics',correct:false,pts:0,max:3,ended:true};
+    endScenario('');
+    showFutureScene();
+    return;
+  }
+  document.getElementById('nav-p6').style.display='inline-block';
+}
+
+function b7(btn,choice){
+  lockBtns(btn.parentElement,'.option-btn');
+  var fb=document.getElementById('fb-q7');
+  if(choice==='A'){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. You gave Dr. Milović everything she needed to confirm the diagnosis quickly and efficiently. Your willingness to name the diagnosis and request specific tests — while remaining respectful of her authority — is exactly the kind of informed advocacy that saves patients. +3 points.';
+    score+=3;alog.q7={sel:'A — Full clinical picture, named HCM, requested ECG and echocardiogram',correct:true,pts:3,max:3};
+  } else if(choice==='B'){
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Providing the facts without naming the diagnosis was overly cautious. Dr. Milović is experienced and reached the correct diagnosis — but it took longer than it needed to. Naming a working diagnosis is not overstepping; it is contributing. -1 point.';
+    score=Math.max(0,score-1);alog.q7={sel:'B — Provided symptoms clearly but did not name a diagnosis or request specific tests',correct:false,pts:-1,max:3,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Complete deference meant Andrew was worked up for a general syncopal episode. Without the specific clinical framing, the HCM diagnosis was not confirmed during this admission. Andrew was discharged with instructions to follow up. Scenario ended.';
+    alog.q7={sel:'C — Deferred entirely to Dr. Milović, answered direct questions only',correct:false,pts:0,max:3,ended:true};
+    endScenario('');
+    showFutureScene();
+    return;
+  }
+  document.getElementById('nav-p7').style.display='inline-block';
+}
+
+function b8(btn,choice,isCorrect){
+  lockBtns(btn.parentElement,'.tf-btn');
+  var fb=document.getElementById('fb-q8');
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. Dynamic obstruction is the defining physiological feature of HCM and the reason exertion, dehydration, and tachycardia are the classic triggers. Understanding this mechanism is what allowed Kevin to make every correct transport and positioning decision. +2 points.';
+    score+=2;alog.q8={sel:'True — dynamic obstruction worsened by tachycardia, reduced filling, and exertion together',correct:true,pts:2,max:2};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='HCM obstruction is dynamic, not fixed — it changes significantly with physiological conditions. This misunderstanding would lead to incorrect management decisions in future similar presentations. Scenario ended.';
+    alog.q8={sel:'False — HCM causes fixed obstruction unaffected by physiological conditions',correct:false,pts:0,max:2,ended:true};
+    endScenario('The obstruction in HCM is dynamic — meaning it changes with ventricular filling volume, heart rate, and contractility. This is the central physiological principle underlying all correct management decisions in this case: why Andrew should not be moved quickly, why he should remain horizontal, why exertion is dangerous, and why the combination of a steep climb, dehydration, and tachycardia produced the syncopal episode. Fixed obstruction would not explain the episodic, exertion-triggered nature of his prior symptoms.');
+    return;
+  }
+  document.getElementById('nav-summary').style.display='inline-block';
+}
+
+function showFutureScene(){
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-7'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  var fs=document.createElement('div');
+  fs.id='phase-future';
+  fs.className='phase active';
+  fs.innerHTML='<div class="future-scene"><h2>Andrew Hale &nbsp;&middot;&nbsp; Age 26 &nbsp;&middot;&nbsp; Undiagnosed</h2><p>Andrew is discharged from the hospital in Nikšić with a diagnosis of vasovagal syncope — the most common and benign cause of fainting, attributed to dehydration and exertion. He is told to stay hydrated and avoid strenuous activity for a few days. His parents fly home without the conversation they needed to have with a cardiologist. Andrew flies home a week later feeling mostly fine.</p><p>The hypertrophic cardiomyopathy is still there. The thickened interventricular septum is still creating dynamic outflow obstruction every time his heart rate rises. He does not know this. He goes back to his life — hiking, running, the recreational sports he has always loved — with no restrictions and no monitoring. The flutter happens again six months later during a run. He pauses, waits for it to pass, and keeps going. It passes. It always has.</p><p>There is no way to know when it will not.</p><div class="physio-box"><div class="physio-label">What an undiagnosed HCM patient faces</div><p style="margin:0;color:rgba(255,255,255,.85);font-family:Arial,sans-serif;font-size:14px;line-height:1.75;">HCM is the leading cause of sudden cardiac death in young people under 35. The condition is manageable with medication, activity modification, and in some cases an implantable cardioverter-defibrillator. Undiagnosed patients who continue high-intensity physical activity carry a significantly elevated risk of a fatal arrhythmic event. The diagnosis is straightforward with an echocardiogram. The tragedy of undiagnosed HCM is not that it is rare or subtle — it is that it is missed.</p></div></div>';
+  var navRow=document.createElement('div');
+  navRow.className='nav-row';
+  navRow.innerHTML='<span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Scenario ended</span><button class="nav-btn primary" onclick="buildSummary(null)">View my submission summary &rarr;</button>';
+  fs.appendChild(navRow);
+  document.querySelector('.wrap').appendChild(fs);
+  window.scrollTo(0,0);
+}
+
+function endScenario(reason){
+  scenarioEnded=true;
+  if(reason){
+    setTimeout(function(){buildSummary(reason);},600);
+  }
+}
+
+function goPhase(n){
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-7','phase-summary'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  if(n===3&&b3wrong){document.getElementById('b3-consequence').style.display='block';}
+  document.getElementById(ids[n]).classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s,i){
+    s.classList.remove('done','active');
+    if(i<n)s.classList.add('done');
+    if(i===n)s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function buildSummary(endReason){
+  var qids=['q1','q2','q3','q4','q5','q6','q7','q8'];
+  var html='';
+  if(endReason){
+    html+='<div class="sq-block incorrect" style="margin-bottom:1.5rem;"><div class="sq-status i">&#10007; Scenario ended here</div><div class="sq-question">'+endReason+'</div></div>';
+  }
+  qids.forEach(function(qid){
+    var def=qdefs[qid];
+    var log=alog[qid];
+    if(!log){
+      html+='<div class="sq-block notreached"><div class="sq-status n">&#8212; Not reached <span class="sq-pts" style="color:var(--text-secondary);">0 / '+def.pts+' pts</span></div><div class="sq-question">'+def.text+'</div><div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div><div class="sq-expl">'+def.exp+'</div></div>';
+      return;
+    }
+    var bc=log.correct?'correct':(log.plausible?'partial':'incorrect');
+    var sc=log.correct?'c':(log.plausible?'p':'i');
+    var st=log.correct?'&#10003; Correct':(log.plausible?'&#9651; Plausible — points deducted':(log.ended?'&#10007; Scenario-ending error':'&#10007; Incorrect'));
+    var ptsStr=log.correct?('+'+log.max+' / '+log.max+' pts'):(log.pts<0?(log.pts+' pts deducted'):('0 / '+log.max+' pts'));
+    var ptsCls=log.correct?'style="color:var(--teal-dark);"':(log.plausible?'style="color:var(--amber-dark);"':'style="color:var(--red);"');
+    html+='<div class="sq-block '+bc+'"><div class="sq-status '+sc+'">'+st+' <span class="sq-pts" '+ptsCls+'>'+ptsStr+'</span></div><div class="sq-question">'+def.text+'</div><div class="sq-answer"><strong>Your answer:</strong> '+log.sel+'</div>';
+    if(!log.correct){html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div><div class="sq-expl">'+def.exp+'</div>';}
+    html+='</div>';
+  });
+  document.getElementById('summary-questions').innerHTML=html;
+  var finalScore=Math.max(0,Math.min(20,score));
+  var pct=Math.round((finalScore/20)*100);
+  var sel=document.getElementById('score-display');
+  sel.textContent=finalScore;
+  sel.className='score-big '+(pct>=70?'pass':'fail');
+  document.getElementById('score-pct-display').textContent=pct+'%';
+  var ob=document.getElementById('outcome-label');
+  if(scenarioEnded){ob.textContent='Scenario ended early';ob.className='outcome-badge ended';}
+  else{ob.textContent='Case completed';ob.className='outcome-badge completed';}
+  document.getElementById('summary-date-display').textContent='Completed: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var allIds=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-7','phase-future'];
+  allIds.forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('active');});
+  document.getElementById('phase-summary').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
+  window.scrollTo(0,0);
+}
+
+function updateName(val){document.getElementById('summary-name-display').textContent=val.trim()||'—';}
+</script>
+</body>
+</html>
