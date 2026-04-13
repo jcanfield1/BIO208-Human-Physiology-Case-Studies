@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 4 — The Water Table | Human Physiology</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;--blue-dark:#0C447C;
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --green:#3B6D11;--green-light:#EAF3DE;
+  --gray-bg:#f8f7f4;--gray-border:#e2e0d8;
+  --text-primary:#1a1917;--text-secondary:#5F5E5A;
+  --radius-md:8px;--radius-lg:12px;
+}
+body{font-family:Georgia,serif;background:var(--gray-bg);color:var(--text-primary);line-height:1.7;min-height:100vh;}
+.page-header{background:#1a2e1a;color:white;padding:2rem 1.5rem 1.5rem;text-align:center;}
+.page-header .course-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:8px;}
+.page-header h1{font-size:28px;font-weight:normal;font-style:italic;margin-bottom:6px;}
+.page-header .tagline{font-family:Arial,sans-serif;font-size:14px;color:rgba(255,255,255,.65);}
+.wrap{max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:8px;}
+.progress-bar{display:flex;gap:5px;}
+.prog-seg{flex:1;height:5px;border-radius:3px;background:var(--gray-border);transition:background .4s;}
+.prog-seg.done{background:var(--teal);}
+.prog-seg.active{background:var(--blue-mid);}
+.phase{display:none;}
+.phase.active{display:block;}
+.phase-heading{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:8px;margin-bottom:1.5rem;}
+.scene-card{background:white;border-radius:0 var(--radius-lg) var(--radius-lg) 0;border:1px solid var(--gray-border);border-left:4px solid var(--blue-mid);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.scene-card.warn{border-left-color:var(--amber);}
+.scene-card.alert{border-left-color:var(--red);}
+.scene-card.ok{border-left-color:var(--teal);}
+.scene-card.earth{border-left-color:#639922;background:#fafdf7;}
+.scene-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:8px;}
+.scene-text{font-size:15px;line-height:1.75;}
+.dialogue{background:#fafaf8;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;}
+.dialogue-speaker{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;}
+.dialogue-text{font-size:15px;font-style:italic;line-height:1.65;}
+.memory-flash{background:#1a2e1a;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid #639922;}
+.memory-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#97C459;margin-bottom:8px;}
+.memory-text{font-size:15px;color:rgba(255,255,255,.88);line-height:1.8;font-style:italic;}
+.kitchen-scene{background:#2a1f0e;border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid #EF9F27;}
+.kitchen-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#FAC775;margin-bottom:8px;}
+.kitchen-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.85;}
+.question-block{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.q-tag{display:inline-block;font-family:Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:3px 9px;margin-bottom:10px;}
+.tag-mc{background:var(--blue-light);color:var(--blue-dark);}
+.tag-tf{background:var(--teal-light);color:var(--teal-dark);}
+.tag-ma{background:var(--amber-light);color:var(--amber-dark);}
+.q-text{font-family:Arial,sans-serif;font-size:15px;font-weight:bold;line-height:1.6;margin-bottom:1rem;}
+.option-btn{display:block;width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:8px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;line-height:1.5;transition:border-color .15s,background .15s;}
+.option-btn:hover:not([disabled]){background:var(--gray-bg);border-color:#b4b2a9;}
+.option-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.option-btn.incorrect{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.option-btn.multi-selected{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);}
+.tf-wrap{display:flex;gap:10px;flex-direction:column;}
+.tf-btn{width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;line-height:1.5;}
+.tf-btn:hover:not([disabled]){background:var(--gray-bg);}
+.tf-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.tf-btn.incorrect{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-md);font-size:14px;font-family:Arial,sans-serif;line-height:1.6;display:none;}
+.feedback.show-correct{display:block;background:var(--teal-light);color:var(--teal-dark);}
+.feedback.show-incorrect{display:block;background:var(--red-light);color:var(--red);}
+.feedback.show-partial{display:block;background:var(--amber-light);color:var(--amber-dark);}
+.check-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 18px;font-size:13px;font-family:Arial,sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:8px;transition:all .15s;}
+.check-btn:hover{background:var(--gray-bg);color:var(--text-primary);}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--gray-border);}
+.nav-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 24px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.nav-btn:hover:not([disabled]){background:var(--gray-bg);}
+.nav-btn[disabled]{opacity:.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);color:white;border-color:var(--blue);}
+.nav-btn.primary:hover{background:var(--blue-dark);}
+.result-banner{background:#1a2e1a;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;}
+.result-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#97C459;margin-bottom:8px;}
+.result-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.75;}
+.summary-header{background:#1a2e1a;color:white;border-radius:var(--radius-lg);padding:1.75rem 1.5rem;text-align:center;margin-bottom:1.5rem;}
+.summary-header h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:4px;}
+.summary-header p{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.7);}
+.score-banner{display:flex;align-items:center;justify-content:center;gap:2rem;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-block{text-align:center;}
+.score-big{font-size:52px;font-family:Arial,sans-serif;font-weight:bold;line-height:1;}
+.score-big.pass{color:var(--teal);}
+.score-big.fail{color:var(--red);}
+.score-label{font-family:Arial,sans-serif;font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.score-divider{width:1px;height:60px;background:var(--gray-border);}
+.stamp-block{border:2px solid var(--teal);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;margin-bottom:1.5rem;background:var(--teal-light);}
+.stamp-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-dark);margin-bottom:6px;}
+.stamp-name{font-size:22px;color:var(--teal-dark);margin-bottom:4px;}
+.stamp-date{font-family:Arial,sans-serif;font-size:13px;color:var(--teal-dark);}
+.name-input-row{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;}
+.name-input-row label{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;}
+.name-input-row input{width:100%;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 12px;font-size:15px;font-family:Georgia,serif;color:var(--text-primary);background:white;}
+.name-input-row input:focus{outline:none;border-color:var(--blue-mid);}
+.submit-instructions{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-family:Arial,sans-serif;font-size:14px;color:var(--amber-dark);line-height:1.7;}
+.summary-section{margin-bottom:1.75rem;}
+.summary-section-title{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:6px;margin-bottom:1rem;}
+.sq-block{border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:10px;background:white;}
+.sq-block.correct{border-left:4px solid var(--teal);}
+.sq-block.incorrect{border-left:4px solid var(--red);}
+.sq-block.partial{border-left:4px solid var(--amber);}
+.sq-status{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sq-status.c{color:var(--teal-dark);}
+.sq-status.i{color:var(--red);}
+.sq-status.p{color:var(--amber-dark);}
+.sq-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;float:right;}
+.sq-question{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;}
+.sq-answer{font-family:Arial,sans-serif;font-size:14px;margin-bottom:4px;}
+.sq-correct-ans{color:var(--teal-dark);}
+.sq-expl{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:8px;border-top:.5px solid var(--gray-border);padding-top:8px;}
+.locked-notice{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius-md);padding:10px 14px;font-family:Arial,sans-serif;font-size:13px;color:var(--red);text-align:center;margin-bottom:1.5rem;}
+@media print{
+  .page-header,.progress-wrap,.nav-row,.submit-instructions,.name-input-row,.locked-notice{display:none!important;}
+  .phase{display:none!important;}
+  #phase-summary{display:block!important;}
+  body{background:white;}
+  .summary-header,.stamp-block{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Human Physiology — Undergraduate Nursing | Case Study 4 of 5</div>
+  <h1>The Water Table</h1>
+  <div class="tagline">A nursing student on rural rotation sees something in a farming community that she has seen before — in the place she came from</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your progress</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+      <div class="prog-seg" id="ps6"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 0 — MEREDITH ARRIVES -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">Harlan County Agricultural Community &nbsp;—&nbsp; Early May, planting season</div>
+    <div class="scene-card earth">
+      <div class="scene-label">Who you are</div>
+      <div class="scene-text">You are Meredith, 23, nursing student in the final year of your program. You grew up in a farming community not unlike this one — different county, different crops, same red clay roads and same particular silence that falls over a place when everyone in it is working too hard to make conversation. You chose this rural rotation yourself. Your program director raised an eyebrow. Most students request hospital placements in the city. You told her you had a reason. You did not tell her the whole reason.</div>
+    </div>
+    <div class="scene-card earth">
+      <div class="scene-label">Why you came</div>
+      <div class="scene-text">You grew up watching people get sick in ways nobody named. Your father. Mrs. Caldwell next door. The Perkins family down the road. Fatigue that everyone called hard work. Trembling hands that everyone called age. Headaches that everyone called the heat. You were a child and you did not have words for it. You have words now. You came here because this community looks like the one you grew up in, and because you need to understand — finally, properly, with the knowledge you have spent four years acquiring — what you were watching all those years ago. You are not here to fix anything. You are here to see clearly.</div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-label">The community — first week of May</div>
+      <div class="scene-text">Planting season is in full swing. The roads are busy with tractors. The air smells like turned earth and something chemical underneath it — fertilizer, pesticide, the particular sharpness that clings to overalls and boots and the skin of people who work outside. The small rural clinic sees about twelve patients a week when it is busy. It has not been busy. Nobody comes unless they cannot avoid it. The doctor who runs the clinic — Dr. Hensley, 60s, has been here thirty years — told you on your first day: "These people will not come to you. If you want to know this community, you have to go to them."</div>
+    </div>
+    <div class="scene-card earth">
+      <div class="scene-label">Your approach — home visits</div>
+      <div class="scene-text">You have been making home visits for two weeks. You bring nothing official — no clipboard, no white coat, no forms. Sometimes you bring food. You knock on doors and introduce yourself and ask if you can sit a while. Most people let you in because that is how this community works — you do not turn away someone who comes to your door in good faith. You listen more than you talk. You are building trust the only way trust gets built in a place like this: slowly, in kitchens, over bad coffee, by being present without agenda.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q1. Making home visits rather than waiting for patients to come to the clinic is an appropriate and effective strategy for building trust in a rural community that is historically skeptical of healthcare workers.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q1','True',true)">True — meeting people in their own environment on their own terms demonstrates respect for their autonomy and removes the clinical power dynamic that often creates distrust</button>
+        <button class="tf-btn" onclick="selectTF(this,'q1','False',false)">False — home visits are inappropriate because they blur professional boundaries and patients should always be assessed in a clinical setting</button>
+      </div>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p1" onclick="goPhase(1)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 — FIRST VISITS -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Home visits — week two</div>
+    <div class="scene-card">
+      <div class="scene-label">The Pruitt household — Tuesday morning</div>
+      <div class="scene-text">Dale Pruitt, 58, has farmed this land his entire life. He is a big man gone lean with age and work. His wife Nadine makes you coffee and asks about your program. Dale sits across the table and answers your questions in short sentences. He is polite but clearly waiting for you to leave so he can get back to the field. You ask how he has been feeling. He says fine. You ask if he has been sleeping well. He pauses before saying mostly. You ask if he has had any headaches lately. He looks at his wife. She looks at her coffee.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Dale Pruitt</div>
+      <div class="dialogue-text">"Had some. More than usual maybe. It's the season — you're up before light, you're running equipment all day. Head hurts sometimes. That's farming."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Nadine Pruitt</div>
+      <div class="dialogue-text">"He's also been more forgetful. He'll start a sentence and — " She stops. Dale looks out the window. "It's probably nothing."</div>
+    </div>
+
+    <div class="memory-flash">
+      <div class="memory-label">Meredith's memory — her father's kitchen, years ago</div>
+      <div class="memory-text">Her father sitting at the table before dawn with his coffee, staring at something that wasn't there. She had asked him what he was thinking about and he had looked at her like he was coming back from somewhere far away. He said nothing, sweetheart. Just tired. She was eight years old and she believed him because what else would an eight-year-old do. She thinks about it now. The particular quality of that stare. The way he rubbed his eyes. The way he said tired like it was the only word he had left.</div>
+    </div>
+
+    <div class="scene-card warn">
+      <div class="scene-label">The Garner household — Thursday afternoon</div>
+      <div class="scene-text">Ruth Garner, 64, meets you at her door with a look that says she knows exactly why you are here and has not decided yet whether to let you in. She does eventually. Her husband Frank is not home — out on the equipment since five in the morning. Ruth mentions, without being asked, that Frank has been having muscle cramps at night. Bad ones. She says he had them last season too but this year they are worse. She rubs her own forearm as she says it, unconsciously. You notice. She notices you noticing.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Ruth Garner</div>
+      <div class="dialogue-text">"I know what you're going to say. He needs to come see the doctor. He won't. You know how it is."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"I'm not going to say that. I just want to understand what you've been seeing."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Ruth Garner</div>
+      <div class="dialogue-text">"He's tired in a way sleep doesn't fix. His eyes bother him — the light. And his stomach has been off for months. He says it's his age. He's sixty-one."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q2. Across two households you have now observed: persistent headaches, unusual fatigue unrelieved by sleep, cognitive slowing, muscle cramps, light sensitivity, and gastrointestinal disturbance — all in agricultural workers during active planting season. What is the most accurate characterization of this symptom pattern?</div>
+      <button class="option-btn" onclick="selectMC(this,'q2','A',false)">A. These are normal seasonal symptoms in farm workers — physical exertion, heat, and disrupted sleep routinely produce this picture</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','B',true)">B. This cluster of neurological and systemic symptoms across multiple individuals in the same agricultural community warrants investigation for a shared environmental exposure</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','C',false)">C. The symptoms are too vague and non-specific to draw any conclusions — more data is needed before any pattern can be identified</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','D',false)">D. These symptoms suggest a viral illness spreading through the community during the busy season</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(0)">Back</button>
+      <button class="nav-btn primary" id="nav-p2" onclick="goPhase(2)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — MARLIN'S KITCHEN -->
+  <div id="phase-2" class="phase">
+    <div class="phase-heading">The Briggs farm &nbsp;—&nbsp; Friday, 7:20 AM</div>
+    <div class="scene-card earth">
+      <div class="scene-label">Evelyn's invitation</div>
+      <div class="scene-text">Evelyn Briggs called the clinic on Thursday afternoon and left a message with the front desk. She had heard about the nursing student doing home visits. She said Meredith was welcome to come by Friday morning if she wanted coffee. She did not say why. She did not need to. You arrive at seven fifteen. The farm is already busy — equipment running somewhere beyond the tree line, the smell of diesel and turned earth. Evelyn meets you at the door in an apron, the coffee already made.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Evelyn Briggs</div>
+      <div class="dialogue-text">"Marlin's still out doing his morning chores. He'll be in soon. He doesn't know I called. He wouldn't have wanted me to."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"I appreciate you reaching out, Mrs. Briggs."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Evelyn Briggs</div>
+      <div class="dialogue-text">"Evelyn. And I'm not sure why I did. I just — you hear things. About you going around talking to people. Actually listening." She sets two mugs on the table. "Marlin has been farming this land for sixty years. He doesn't complain. He never has. So when something is wrong you have to learn to see it in other ways."</div>
+    </div>
+
+    <div class="kitchen-scene">
+      <div class="kitchen-label">7:34 AM — Marlin comes in</div>
+      <div class="kitchen-text">The back door opens and Marlin Briggs comes in from the morning. He is in his eighties and he moves like a man who has never considered stopping — deliberate, unhurried, the walk of someone who knows every inch of this ground and expects it to hold him. He is lean and weathered and his eyes are sharp. He sees you at the table and there is a brief moment of assessment — not unfriendly, just careful. He hangs his hat. He washes his hands at the sink. He says good morning to Evelyn and pours himself coffee without asking if there is any.<br><br>He sits down across from you.<br><br>He wraps both hands around the mug. Takes a long drink. And then his right hand trembles — just slightly, just for a moment — and he sets the mug down. He looks at his hand. He looks at the table. He does not look at you. He picks the mug back up with a deliberate steadiness, as if the first time did not happen.<br><br>Evelyn is looking at you. She caught it. You caught it. Marlin knows both of you caught it. Nobody says anything.</div>
+    </div>
+
+    <div class="memory-flash">
+      <div class="memory-label">Meredith's memory — her father's hands</div>
+      <div class="memory-text">His hands around a coffee cup. That is the image. The particular way he held it in the mornings, both hands, the way you hold something when you are cold or when you need steadying. She was twelve the first time she noticed the tremor. She thought he was cold. It was July. She did not ask. Children learn not to ask about the things adults are already pretending not to see. She is not twelve anymore. She is not pretending.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q3. Marlin is in his eighties and has worked physically demanding farm labor his entire life. He is presenting with a fine resting tremor that he is minimizing. In the context of what you have already observed across this community, what is the most appropriate clinical interpretation of this finding?</div>
+      <button class="option-btn" onclick="selectMC(this,'q3','A',false)">A. A resting tremor in an elderly man is most likely essential tremor or early Parkinson's disease — common age-related neurological findings unrelated to occupational exposure</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','B',false)">B. The tremor is likely caused by overexertion and dehydration during morning chores — advise rest and increased fluid intake</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','C',true)">C. In the context of multiple community members showing overlapping neurological and systemic symptoms, a resting tremor in a longtime farmer warrants consideration of chronic neurotoxic exposure — particularly organophosphate pesticide poisoning</button>
+      <button class="option-btn" onclick="selectMC(this,'q3','D',false)">D. A single observation of tremor is insufficient to form any clinical interpretation — this finding should be documented and ignored until confirmed in a clinical setting</button>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(1)">Back</button>
+      <button class="nav-btn primary" id="nav-p3" onclick="goPhase(3)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 — THE PHYSIOLOGY -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">The physiology of chronic organophosphate exposure</div>
+    <div class="scene-card">
+      <div class="scene-label">What Meredith knows</div>
+      <div class="scene-text">You sit with your coffee going cold and Marlin staring at the window and Evelyn very still beside the counter. Your mind is moving through what you know. Organophosphates are the active compounds in most non-organic pesticides — they work by disrupting the nervous systems of insects. The problem is that they disrupt nervous systems in general. When humans are chronically exposed — through skin contact, inhalation, or ingestion — the physiological consequences accumulate slowly and look exactly like what you have been seeing in this community for two weeks.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q4. Organophosphates cause neurological harm by inhibiting acetylcholinesterase. What is the direct physiological consequence of this inhibition?</div>
+      <button class="option-btn" onclick="selectMC(this,'q4','A',false)">A. Acetylcholine is prevented from being produced, reducing nerve signal transmission throughout the body</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','B',true)">B. Acetylcholine accumulates at nerve synapses because it cannot be broken down — causing continuous, unregulated nerve stimulation across both the central and peripheral nervous systems</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','C',false)">C. The myelin sheath around nerve fibers is destroyed, causing progressive nerve signal loss similar to multiple sclerosis</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','D',false)">D. Dopamine receptors are blocked, producing symptoms similar to Parkinson's disease through a different mechanism</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q5. Chronic low-level organophosphate exposure produces a sudden dramatic onset of symptoms — making it easy to identify because affected individuals experience a clear acute episode that prompts them to seek medical care.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q5','True',false)">True — organophosphate poisoning always presents acutely and dramatically</button>
+        <button class="tf-btn" onclick="selectTF(this,'q5','False',true)">False — chronic low-level exposure produces gradual, accumulating symptoms that are easily attributed to other causes such as aging, fatigue, or stress, which is exactly why it goes unrecognized for so long</button>
+      </div>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q6. Which of the following symptoms are consistent with chronic organophosphate exposure through acetylcholinesterase inhibition? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q6')">A. Persistent headaches and cognitive slowing</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q6')">B. Muscle weakness, cramping, and fine tremor</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q6')">C. Increased bone density from chronic chemical exposure</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q6')">D. Gastrointestinal disturbance including nausea and cramping</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q6')">E. Visual disturbances including light sensitivity and blurred vision</button>
+      <button class="option-btn multi" data-letter="F" onclick="toggleMA(this,'q6')">F. Fatigue unrelieved by sleep</button>
+      <button class="check-btn" onclick="checkMA('q6',['A','B','D','E','F'])">Check my answers</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(2)">Back</button>
+      <button class="nav-btn primary" id="nav-p4" onclick="goPhase(4)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 — THE WATER TABLE -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">Meredith's growing understanding &nbsp;—&nbsp; the water supply</div>
+    <div class="scene-card warn">
+      <div class="scene-label">The detail that changes everything</div>
+      <div class="scene-text">On your third week of visits you learn something that shifts the entire picture. This community draws its water from underground wells — the same aquifer that runs beneath the fields. You have known this abstractly since you arrived but you have been thinking about exposure as occupational — the farmers in the fields, the workers handling the chemicals. But the water changes that. If organophosphates are leaching from the fields into the water table, then exposure is not limited to people who handle pesticides. It includes everyone who drinks the water. Every household. Every family member. Every person in this community regardless of whether they ever set foot in a field.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q7. The community uses groundwater drawn from an aquifer beneath non-organic agricultural fields. Organophosphate pesticides are applied regularly to these fields during planting season. What is the most significant public health implication of this combination?</div>
+      <button class="option-btn" onclick="selectMC(this,'q7','A',false)">A. The risk is limited to farmers who work directly with pesticides — groundwater contamination is unlikely because soil filters most chemical compounds before they reach the aquifer</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','B',false)">B. The risk is primarily seasonal — contamination occurs only during active application periods and clears naturally between growing seasons</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','C',true)">C. Organophosphate leaching into the aquifer creates a community-wide chronic exposure route that affects everyone who uses the water supply — far beyond those with occupational exposure — and accumulates over time with repeated seasonal applications</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','D',false)">D. The risk is significant but only for the most vulnerable populations — the elderly and very young — because healthy adults metabolize organophosphates efficiently</button>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q8. Bioaccumulation means that organophosphate compounds build up in human tissue over time with repeated low-level exposure, so that people with years of exposure may carry a greater toxic burden than their current symptoms suggest.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q8','True',true)">True — chronic exposure accumulates and the body's capacity to metabolize and excrete the compounds is eventually exceeded, producing progressively worsening symptoms</button>
+        <button class="tf-btn" onclick="selectTF(this,'q8','False',false)">False — organophosphates are rapidly and completely eliminated by the body and do not accumulate with repeated exposure</button>
+      </div>
+      <div class="feedback" id="fb-q8"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(3)">Back</button>
+      <button class="nav-btn primary" id="nav-p5" onclick="goPhase(5)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — CONVINCING MARLIN -->
+  <div id="phase-5" class="phase">
+    <div class="phase-heading">The Briggs farm &nbsp;—&nbsp; the following Tuesday</div>
+    <div class="scene-card">
+      <div class="scene-label">Coming back</div>
+      <div class="scene-text">You have thought carefully about how to do this. You cannot come in with data and clinical language and a diagnosis. Marlin will close like a door. You have watched him for weeks now — he respects directness but not presumption. He respects people who have earned their standing. You have not earned it yet. But Evelyn has given you an opening by inviting you back, and this time Marlin is expecting you. He is in the kitchen when you arrive. He does not seem surprised.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs</div>
+      <div class="dialogue-text">"Evelyn says you want to talk. So talk."</div>
+    </div>
+
+    <div class="memory-flash">
+      <div class="memory-label">What Meredith says — and the memory behind it</div>
+      <div class="memory-text">She does not lead with the diagnosis. She leads with her father. She tells Marlin that she grew up on a farm. That her father worked land not unlike this for thirty years. That he was a man like Marlin — proud, physical, not given to complaint. She tells him that she watched her father get tired in ways he could not explain. She watched his hands. She watched him lose words mid-sentence and look around for them like they had fallen on the floor. She was a child and she thought it was just what getting older looked like. She is a nursing student now and she knows it was not. She tells Marlin she is not here to tell him what is wrong with him. She is here because she cannot stop seeing her father when she looks at this community. And she needs to understand — for him, for herself, for every place like this one — whether the water is safe.</div>
+    </div>
+
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs — a long silence before he speaks</div>
+      <div class="dialogue-text">"My hands have been shaking for two years. I thought it was age. I still think it probably is."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"It might be. I'm not telling you it isn't. I'm asking if you'll let me test the water. That's all. Just the water."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs</div>
+      <div class="dialogue-text">"And if the water is fine?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"Then I was wrong and I'll tell you I was wrong."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs — after another silence</div>
+      <div class="dialogue-text">"Test the water."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q9. Meredith chose to approach Marlin with her personal history rather than clinical data. In the context of rural healthcare and community trust, why is this the most effective approach?</div>
+      <button class="option-btn" onclick="selectMC(this,'q9','A',false)">A. Personal stories are more persuasive than clinical data in all healthcare settings and should always be used instead of evidence-based communication</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','B',true)">B. In communities with historical distrust of outside medical authority, establishing shared experience and demonstrating genuine personal investment builds the relational trust that is necessary before clinical information can be heard and acted upon</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','C',false)">C. Meredith avoided clinical language because she was not confident in her diagnosis and did not want to be challenged on the medical details</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','D',false)">D. Using personal narrative is a manipulation technique that bypasses a patient's rational decision-making and is ethically problematic</button>
+      <div class="feedback" id="fb-q9"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q10. Meredith was correct to ask only for water testing rather than immediately demanding that Marlin and the community submit to clinical evaluation — because beginning with the least invasive and least threatening request preserves patient autonomy while still initiating the diagnostic process.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q10','True',true)">True — meeting patients where they are and making incremental requests that respect their autonomy is fundamental to ethical healthcare practice, particularly in resistant communities</button>
+        <button class="tf-btn" onclick="selectTF(this,'q10','False',false)">False — Meredith should have insisted on immediate clinical evaluation given the severity of her concerns, overriding the community's resistance if necessary</button>
+      </div>
+      <div class="feedback" id="fb-q10"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(4)">Back</button>
+      <button class="nav-btn primary" id="nav-p6" onclick="goPhase(6)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 6 — CONFIRMATION AND RESOLUTION -->
+  <div id="phase-6" class="phase">
+    <div class="phase-heading">The test results &nbsp;—&nbsp; ten days later</div>
+    <div class="result-banner">
+      <div class="result-label">Water testing results — Harlan County Agricultural Community</div>
+      <div class="result-text">Organophosphate compounds detected in groundwater samples drawn from six wells across the community. Levels in three wells exceed EPA safety thresholds for human consumption. Two additional wells show detectable but sub-threshold levels. The contamination pattern is consistent with seasonal pesticide application leaching into the shared aquifer over multiple years. The source is not a single farm. It is the accumulated result of standard agricultural practice across the entire watershed.</div>
+    </div>
+
+    <div class="scene-card alert">
+      <div class="scene-label">What this means</div>
+      <div class="scene-text">This is not an occupational hazard for the people who handle chemicals. This is everyone. The families who never touch pesticides. The spouses who stayed home. The neighbors who just drank the water because the water came from the ground and the ground was theirs and why would the ground poison them. The symptoms that everyone in this community has been calling fatigue and age and hard work have a name now. They have a source. And the source has been in the water for years.</div>
+    </div>
+
+    <div class="memory-flash">
+      <div class="memory-label">Meredith — sitting with what she now knows</div>
+      <div class="memory-text">She thinks about home. About her father coming in from the fields and filling a glass from the tap and drinking it down in one long pull the way thirsty people do. About the kitchen tap running while her mother washed dishes. About every glass of water her family drank for years from a well that sat beneath fields that looked just like these ones. She does not cry. She sits with it. She has been sitting with it for a long time without having words for it. She has words now. She does not know if having words makes it better or just more specific.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q11. The water testing has confirmed organophosphate contamination above EPA safety thresholds in a community water supply. What is the correct public health reporting and response action?</div>
+      <button class="option-btn" onclick="selectMC(this,'q11','A',false)">A. Share the results privately with Marlin and let the community decide among themselves whether to take action — their land, their water, their choice</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','B',false)">B. Report the findings to Dr. Hensley at the clinic and wait for him to initiate the public health response through official channels</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','C',true)">C. Report immediately to the county and state public health department — confirmed chemical contamination above safety thresholds in a community water supply is a mandatory reportable public health event requiring immediate official response regardless of community preference</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','D',false)">D. Wait until the community has been fully informed and consented before making any external reports — community trust must be preserved above all other considerations</button>
+      <div class="feedback" id="fb-q11"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-ma">Select All That Apply</div>
+      <div class="q-text">Q12. The community has now been informed of the contamination. Which of the following are appropriate immediate public health interventions? Select all that apply.</div>
+      <button class="option-btn multi" data-letter="A" onclick="toggleMA(this,'q12')">A. Provide the community with safe alternative water sources immediately while the contaminated supply is addressed</button>
+      <button class="option-btn multi" data-letter="B" onclick="toggleMA(this,'q12')">B. Initiate blood cholinesterase testing for community members to assess the degree of organophosphate exposure</button>
+      <button class="option-btn multi" data-letter="C" onclick="toggleMA(this,'q12')">C. Reassure the community that symptoms will resolve immediately once the water source is changed</button>
+      <button class="option-btn multi" data-letter="D" onclick="toggleMA(this,'q12')">D. Begin remediation planning for the contaminated aquifer in coordination with the EPA and state agricultural authorities</button>
+      <button class="option-btn multi" data-letter="E" onclick="toggleMA(this,'q12')">E. Educate the community about organophosphate toxicity, its symptoms, and the physiological basis of those symptoms so they can make informed decisions about their healthcare</button>
+      <button class="check-btn" onclick="checkMA('q12',['A','B','D','E'])">Check my answers</button>
+      <div class="feedback" id="fb-q12"></div>
+    </div>
+
+    <div class="scene-card ok">
+      <div class="scene-label">Marlin — the last conversation</div>
+      <div class="scene-text">You go back to tell Marlin the results yourself. You do not send a letter. You sit at his kitchen table with Evelyn and you tell him what the water showed. He listens without interrupting. When you finish he is quiet for a long time. He looks at his hands — both of them, resting on the table. Then he looks at you.</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs</div>
+      <div class="dialogue-text">"How long has it been like this?"</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"We don't know exactly. Years, probably. Maybe longer."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs</div>
+      <div class="dialogue-text">"And my neighbors. The Pruitts. The Garners."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Meredith — You</div>
+      <div class="dialogue-text">"Yes."</div>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-speaker">Marlin Briggs — quietly</div>
+      <div class="dialogue-text">"I'll make some calls. People around here will listen to me before they listen to a government report."</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q13. Marlin's willingness to communicate the findings to his neighbors represents an effective application of community health principles — using trusted internal voices to disseminate health information in resistant communities produces better outcomes than top-down institutional communication alone.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q13','True',true)">True — community health research consistently shows that trusted community members are more effective messengers of health information than outside authorities in historically skeptical communities</button>
+        <button class="tf-btn" onclick="selectTF(this,'q13','False',false)">False — health information should always be delivered by credentialed medical professionals to ensure accuracy and authority</button>
+      </div>
+      <div class="feedback" id="fb-q13"></div>
+    </div>
+
+    <div class="scene-card earth" style="margin-top:1.25rem;">
+      <div class="scene-label">What Meredith carries home</div>
+      <div class="scene-text">The rotation ends three weeks later. The county public health department has opened a formal investigation. Alternative water is being distributed. Blood cholinesterase testing has begun for community members who agreed to it — which, after Marlin made his calls, turned out to be most of them. The aquifer remediation will take years. The symptoms will not resolve overnight for people who have been accumulating this exposure for a decade or more. But the community knows now. They have a name for what has been happening to them. They did not have that before Meredith knocked on their doors with no clipboard and nothing to sell them except the willingness to listen.<br><br>She drives out of the county on a Tuesday morning with the windows down. She thinks about her father. She thinks about the tap running in her mother's kitchen. She does not have answers for her own hometown — she may never have them. But she understands now, with a clarity that four years of school could not have given her alone, that the most important diagnostic tool she will ever have is the willingness to notice what other people have learned to stop seeing.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(5)">Back</button>
+      <button class="nav-btn primary" onclick="buildSummary()">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY PAGE -->
+  <div id="phase-summary" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers and score cannot be changed.</div>
+    <div class="summary-header">
+      <h2>Case Study 4 — Submission Summary</h2>
+      <p>Human Physiology &nbsp;|&nbsp; BIO 208 &nbsp;|&nbsp; The Water Table</p>
+    </div>
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-display">—</div>
+        <div class="score-label">Points earned</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div style="font-size:28px;font-family:Arial,sans-serif;font-weight:bold;" id="score-pct-display">—</div>
+        <div class="score-label">Out of 20</div>
+      </div>
+    </div>
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment.
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">All questions — your answers and explanations</div>
+      <div id="summary-questions"></div>
+    </div>
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Case study complete</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var score=0;
+var mcLocked={};
+var tfLocked={};
+var maLocked={};
+var alog={};
+
+var qdefs={
+  q1:{text:'Q1. Home visits are an appropriate trust-building strategy in resistant rural communities. (T/F)',pts:1,
+    cl:'True',
+    exp:'Meeting community members in their own environment removes clinical power dynamics and demonstrates that the healthcare worker values relationship over authority. In communities with historical distrust of outside medical institutions, trust must be built before health information can be received. Home visits are a well-established community health practice.'},
+  q2:{text:'Q2. How should Meredith characterize the symptom pattern observed across two households?',pts:2,
+    cl:'B — The cluster of neurological and systemic symptoms across multiple individuals in the same agricultural community warrants investigation for a shared environmental exposure',
+    exp:'When multiple individuals in the same community share an overlapping cluster of neurological and systemic symptoms — particularly in an agricultural setting with known chemical exposures — the pattern warrants environmental investigation. Dismissing symptoms as seasonal or insufficient for pattern recognition delays a potentially critical public health finding.'},
+  q3:{text:'Q3. How should Meredith interpret Marlin\'s tremor in the context of what she has already observed?',pts:2,
+    cl:'C — In the context of overlapping neurological symptoms across multiple community members, a resting tremor in a longtime farmer warrants consideration of chronic neurotoxic organophosphate exposure',
+    exp:'While age-related tremor is common, the clinical context changes the interpretation dramatically. Pattern recognition — connecting an individual finding to a community-wide picture — is the core of public health nursing. Dismissing the tremor as age-related in isolation ignores the epidemiological signal already present across multiple households.'},
+  q4:{text:'Q4. What is the direct physiological consequence of acetylcholinesterase inhibition by organophosphates?',pts:2,
+    cl:'B — Acetylcholine accumulates at nerve synapses because it cannot be broken down, causing continuous unregulated nerve stimulation across the nervous system',
+    exp:'Acetylcholinesterase is the enzyme responsible for breaking down acetylcholine after it has transmitted a nerve signal across a synapse. When organophosphates inhibit this enzyme, acetylcholine builds up and continues stimulating nerve receptors without stopping. This continuous stimulation produces the characteristic SLUDGE symptoms of acute poisoning and the neurological, muscular, and gastrointestinal symptoms of chronic exposure.'},
+  q5:{text:'Q5. Chronic low-level organophosphate exposure produces sudden dramatic onset symptoms. (T/F)',pts:2,
+    cl:'False — chronic exposure produces gradual accumulating symptoms easily attributed to other causes',
+    exp:'This is the central reason chronic organophosphate poisoning goes unrecognized for so long. Unlike acute poisoning — which produces dramatic SLUDGE symptoms — chronic low-level exposure produces subtle, progressive neurological and systemic changes that closely mimic normal aging, fatigue, and occupational wear. Communities exposed over years rarely connect their symptoms to a chemical cause precisely because the symptoms appear gradually and have always been there.'},
+  q6:{text:'Q6. Which symptoms are consistent with chronic organophosphate exposure?',pts:2,
+    cl:'A, B, D, E, and F',
+    exp:'Organophosphate-induced acetylcholinesterase inhibition affects both the central and peripheral nervous systems and the autonomic nervous system. Central effects include headaches, cognitive slowing, and fatigue. Peripheral neuromuscular effects include muscle weakness, cramping, and tremor. Autonomic effects include gastrointestinal disturbance and secretory changes. Visual effects including miosis and light sensitivity result from autonomic involvement of the pupillary muscles. Increased bone density (C) is not associated with organophosphate exposure.'},
+  q7:{text:'Q7. What is the most significant public health implication of organophosphate use above a shared groundwater aquifer?',pts:2,
+    cl:'C — Leaching into the aquifer creates community-wide chronic exposure affecting everyone who uses the water supply, accumulating over repeated seasonal applications',
+    exp:'Groundwater contamination transforms an occupational hazard into a community-wide public health crisis. Organophosphates are water-soluble and can leach through soil into aquifers, particularly with repeated seasonal application over years. Once in the groundwater, the exposure route shifts from dermal and inhalation contact to ingestion — meaning people who never handle pesticides directly are chronically consuming contaminated water with every meal and drink.'},
+  q8:{text:'Q8. Organophosphates build up in human tissue over time with repeated low-level exposure. (T/F)',pts:1,
+    cl:'True — chronic exposure accumulates and eventually exceeds the body\'s metabolic capacity',
+    exp:'While organophosphates are not as lipophilic as some persistent organic pollutants, chronic inhibition of acetylcholinesterase is cumulative. With repeated low-level exposure, the body\'s capacity to regenerate inhibited enzyme is exceeded and the overall cholinesterase activity in the blood and nervous system progressively declines. This is why symptoms worsen gradually over years of exposure and why people with longer exposure histories show more severe presentations.'},
+  q9:{text:'Q9. Why was leading with personal history rather than clinical data the most effective approach with Marlin?',pts:2,
+    cl:'B — In communities with historical distrust of outside medical authority, shared experience and genuine personal investment build relational trust necessary before clinical information can be heard',
+    exp:'Community health research consistently demonstrates that in skeptical communities, clinical authority alone does not produce behavior change. Trust must precede information. Meredith\'s personal narrative accomplished three things simultaneously: it established her as someone with genuine stakes in the outcome, it positioned her as a fellow member of an affected community rather than an outside authority, and it demonstrated that she was asking for something modest — water testing — rather than demanding compliance. This is textbook community health engagement.'},
+  q10:{text:'Q10. Asking only for water testing rather than demanding clinical evaluation was the correct approach. (T/F)',pts:1,
+    cl:'True — incremental requests that respect autonomy preserve trust while still initiating the diagnostic process',
+    exp:'Patient and community autonomy is a foundational ethical principle in healthcare. Overriding resistance through institutional authority or coercion — even with good intentions — destroys trust and produces worse long-term health outcomes in resistant communities. Starting with the least invasive, least threatening request that still advances the diagnostic process respects autonomy while moving toward necessary answers. This approach is both ethically correct and practically more effective.'},
+  q11:{text:'Q11. What is the correct response when confirmed chemical contamination above EPA thresholds is found in a community water supply?',pts:2,
+    cl:'C — Report immediately to county and state public health departments — confirmed contamination above safety thresholds is a mandatory reportable public health event',
+    exp:'Confirmed chemical contamination of a community water supply above EPA safety thresholds triggers mandatory public health reporting obligations that exist independent of community preference or consent. Unlike individual patient health information — which requires consent — a contaminated shared water supply is a public health hazard that affects the entire community and requires immediate official response. Community trust is important but cannot supersede the legal and ethical obligation to protect public health.'},
+  q12:{text:'Q12. Which are appropriate immediate public health interventions following confirmation of contamination?',pts:2,
+    cl:'A, B, D, and E',
+    exp:'Providing safe water (A) addresses the ongoing exposure immediately. Blood cholinesterase testing (B) assesses the degree of physiological impact across the community. Aquifer remediation planning (D) addresses the source. Community education (E) enables informed decision-making and healthcare engagement. Option C is incorrect because symptoms from chronic organophosphate exposure do not resolve immediately — acetylcholinesterase regeneration takes weeks to months, and neurological damage from long-term exposure may be only partially reversible. False reassurance about recovery timelines is harmful.'},
+  q13:{text:'Q13. Using trusted community members to disseminate health information produces better outcomes than top-down institutional communication alone. (T/F)',pts:1,
+    cl:'True — trusted internal voices are more effective health messengers in historically skeptical communities',
+    exp:'This is one of the most consistently supported findings in community health research. In communities with institutional distrust, information delivered by outsiders — regardless of credentials — is filtered through suspicion. The same information delivered by a respected community member bypasses that filter. Marlin\'s willingness to make calls represents exactly the kind of community-level engagement that determines whether a public health response succeeds or fails in reaching resistant populations.'}
+};
+
+function selectMC(btn,qid,letter,isCorrect){
+  if(mcLocked[qid])return;
+  mcLocked[qid]=true;
+  var siblings=btn.parentElement.querySelectorAll('.option-btn:not(.multi)');
+  siblings.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:btn.textContent.trim().substring(0,60),correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    siblings.forEach(function(b){if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf(',true)')!==-1)b.classList.add('correct');});
+    alog[qid]={sel:btn.textContent.trim().substring(0,60),correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  checkPhaseComplete();
+}
+
+function selectTF(btn,qid,label,isCorrect){
+  if(tfLocked[qid])return;
+  tfLocked[qid]=true;
+  var siblings=btn.parentElement.querySelectorAll('.tf-btn');
+  siblings.forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:label,correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    siblings.forEach(function(b){if(b!==btn)b.classList.add('correct');});
+    alog[qid]={sel:label,correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  checkPhaseComplete();
+}
+
+var maSelected={};
+function toggleMA(btn,qid){
+  if(maLocked[qid])return;
+  btn.classList.toggle('multi-selected');
+}
+
+function checkMA(qid,correctArr){
+  if(maLocked[qid])return;
+  maLocked[qid]=true;
+  var block=document.getElementById('fb-'+qid).parentElement;
+  var selected=[];
+  block.querySelectorAll('.option-btn.multi').forEach(function(b){
+    b.disabled=true;
+    var letter=b.getAttribute('data-letter');
+    var wasSelected=b.classList.contains('multi-selected');
+    if(wasSelected)selected.push(letter);
+    b.classList.remove('multi-selected');
+    if(correctArr.indexOf(letter)!==-1)b.classList.add('correct');
+    else if(wasSelected)b.classList.add('incorrect');
+  });
+  var isCorrect=JSON.stringify(selected.slice().sort())===JSON.stringify(correctArr.slice().sort());
+  var fb=document.getElementById('fb-'+qid);
+  fb.className=isCorrect?'feedback show-correct':'feedback show-partial';
+  fb.textContent=(isCorrect?'Correct. ':'Not quite. ')+qdefs[qid].exp;
+  if(isCorrect)score+=qdefs[qid].pts;
+  alog[qid]={sel:selected.length>0?selected.join(', '):'None selected',correct:isCorrect,pts:isCorrect?qdefs[qid].pts:0,max:qdefs[qid].pts};
+  checkPhaseComplete();
+}
+
+var phaseQuestions={
+  0:['q1'],1:['q2'],2:['q3'],3:['q4','q5','q6'],4:['q7','q8'],5:['q9','q10'],6:['q11','q12','q13']
+};
+var currentPhase=0;
+
+function checkPhaseComplete(){
+  var qs=phaseQuestions[currentPhase]||[];
+  var allAnswered=qs.every(function(qid){return alog[qid]!==undefined;});
+  if(allAnswered){
+    var navId='nav-p'+(currentPhase+1);
+    var navEl=document.getElementById(navId);
+    if(navEl)navEl.style.display='inline-block';
+  }
+}
+
+function goPhase(n){
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6','phase-summary'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById(ids[n]).classList.add('active');
+  currentPhase=n;
+  document.querySelectorAll('.prog-seg').forEach(function(s,i){
+    s.classList.remove('done','active');
+    if(i<n)s.classList.add('done');
+    if(i===n)s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function buildSummary(){
+  var qids=['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13'];
+  var html='';
+  qids.forEach(function(qid){
+    var def=qdefs[qid];
+    var log=alog[qid];
+    var bc=log?(log.correct?'correct':'incorrect'):'notreached';
+    var sc=log?(log.correct?'c':'i'):'n';
+    var st=log?(log.correct?'&#10003; Correct':'&#10007; Incorrect'):'&#8212; Not answered';
+    var ptsStr=log?(log.correct?('+'+log.max+' / '+log.max+' pts'):('0 / '+log.max+' pts')):'0 / '+def.pts+' pts';
+    var ptsCls=log&&log.correct?'style="color:var(--teal-dark);"':'style="color:var(--red);"';
+    html+='<div class="sq-block '+bc+'"><div class="sq-status '+sc+'">'+st+' <span class="sq-pts" '+ptsCls+'>'+ptsStr+'</span></div>';
+    html+='<div class="sq-question">'+def.text+'</div>';
+    if(log)html+='<div class="sq-answer"><strong>Your answer:</strong> '+(log.sel||'—')+'</div>';
+    if(!log||!log.correct){
+      html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div>';
+      html+='<div class="sq-expl">'+def.exp+'</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('summary-questions').innerHTML=html;
+  var finalScore=Math.max(0,Math.min(20,score));
+  var pct=Math.round((finalScore/20)*100);
+  var sel=document.getElementById('score-display');
+  sel.textContent=finalScore;
+  sel.className='score-big '+(pct>=70?'pass':'fail');
+  document.getElementById('score-pct-display').textContent=pct+'%';
+  document.getElementById('summary-date-display').textContent='Completed: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-6'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('phase-summary').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
+  window.scrollTo(0,0);
+}
+
+function updateName(val){document.getElementById('summary-name-display').textContent=val.trim()||'—';}
+
+document.querySelectorAll('.nav-btn.primary[id^="nav-p"]').forEach(function(btn){btn.style.display='none';});
+checkPhaseComplete();
+</script>
+</body>
+</html>
