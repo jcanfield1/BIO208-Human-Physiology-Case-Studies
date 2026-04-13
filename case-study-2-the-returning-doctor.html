@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 2 — The Returning Doctor | Human Physiology</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;--blue-dark:#0C447C;
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --red:#A32D2D;--red-light:#FCEBEB;--red-dark:#791F1F;
+  --purple:#534AB7;--purple-light:#EEEDFE;
+  --gray-bg:#f8f7f4;--gray-border:#e2e0d8;
+  --text-primary:#1a1917;--text-secondary:#5F5E5A;
+  --radius-md:8px;--radius-lg:12px;
+}
+body{font-family:Georgia,serif;background:var(--gray-bg);color:var(--text-primary);line-height:1.7;min-height:100vh;}
+.page-header{background:var(--blue-dark);color:white;padding:2rem 1.5rem 1.5rem;text-align:center;}
+.page-header .course-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.65);margin-bottom:8px;}
+.page-header h1{font-size:28px;font-weight:normal;font-style:italic;margin-bottom:6px;}
+.page-header .tagline{font-family:Arial,sans-serif;font-size:14px;color:rgba(255,255,255,.7);}
+.wrap{max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:8px;}
+.progress-bar{display:flex;gap:5px;}
+.prog-seg{flex:1;height:5px;border-radius:3px;background:var(--gray-border);transition:background .4s;}
+.prog-seg.done{background:var(--teal);}
+.prog-seg.active{background:var(--blue-mid);}
+.phase{display:none;}
+.phase.active{display:block;}
+.phase-heading{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:8px;margin-bottom:1.5rem;}
+.scene-card{background:white;border-radius:0 var(--radius-lg) var(--radius-lg) 0;border:1px solid var(--gray-border);border-left:4px solid var(--blue-mid);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.scene-card.warn{border-left-color:var(--amber);}
+.scene-card.alert{border-left-color:var(--red);}
+.scene-card.ok{border-left-color:var(--teal);}
+.scene-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:8px;}
+.scene-text{font-size:15px;line-height:1.75;}
+.dialogue{background:#fafaf8;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;}
+.dialogue-speaker{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;}
+.dialogue-text{font-size:15px;font-style:italic;line-height:1.65;}
+.vitals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem;}
+.vital-card{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:.75rem 1rem;}
+.vital-label{font-family:Arial,sans-serif;font-size:10px;color:var(--text-secondary);margin-bottom:4px;}
+.vital-value{font-size:18px;font-family:Arial,sans-serif;font-weight:bold;color:var(--text-primary);}
+.vital-note{font-family:Arial,sans-serif;font-size:10px;color:var(--amber);margin-top:2px;}
+.vital-note.danger{color:var(--red);}
+.question-block{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.q-tag{display:inline-block;font-family:Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:3px 9px;margin-bottom:10px;}
+.tag-mc{background:var(--blue-light);color:var(--blue-dark);}
+.tag-tf{background:var(--teal-light);color:var(--teal-dark);}
+.q-text{font-family:Arial,sans-serif;font-size:15px;font-weight:bold;line-height:1.6;margin-bottom:1rem;}
+.option-btn{display:block;width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:8px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;line-height:1.5;transition:border-color .15s,background .15s;}
+.option-btn:hover:not([disabled]){background:var(--gray-bg);border-color:#b4b2a9;}
+.option-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.option-btn.plausible{border-color:var(--amber);background:var(--amber-light);color:var(--amber-dark);}
+.option-btn.ended{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.tf-wrap{display:flex;gap:10px;flex-direction:column;}
+.tf-btn{width:100%;text-align:left;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;line-height:1.5;}
+.tf-btn:hover:not([disabled]){background:var(--gray-bg);}
+.tf-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.tf-btn.ended{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-md);font-size:14px;font-family:Arial,sans-serif;line-height:1.6;display:none;}
+.feedback.show-correct{display:block;background:var(--teal-light);color:var(--teal-dark);}
+.feedback.show-plausible{display:block;background:var(--amber-light);color:var(--amber-dark);}
+.feedback.show-ended{display:block;background:var(--red-light);color:var(--red);}
+.consequence-screen{background:#1a1917;color:white;border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;}
+.consequence-screen h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:1rem;color:#f0c0c0;}
+.consequence-screen p{font-family:Arial,sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,.85);margin-bottom:1rem;}
+.physio-box{background:rgba(255,255,255,.08);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:1rem;}
+.physio-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.memory-flash{background:#2c2150;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid #7F77DD;}
+.memory-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#AFA9EC;margin-bottom:8px;}
+.memory-text{font-size:15px;color:#e8e6ff;line-height:1.75;font-style:italic;}
+.magnitude-scene{background:#1a1917;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;}
+.magnitude-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.magnitude-text{font-size:15px;color:rgba(255,255,255,.9);line-height:1.75;}
+.exposed-tag{display:inline-block;background:rgba(227,75,74,.2);border:1px solid rgba(227,75,74,.4);border-radius:var(--radius-md);padding:5px 12px;margin:4px;font-family:Arial,sans-serif;font-size:13px;color:#f09595;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--gray-border);}
+.nav-btn{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:10px 24px;font-size:14px;font-family:Arial,sans-serif;color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.nav-btn:hover:not([disabled]){background:var(--gray-bg);}
+.nav-btn[disabled]{opacity:.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);color:white;border-color:var(--blue);}
+.nav-btn.primary:hover{background:var(--blue-dark);}
+/* SUMMARY */
+.summary-header{background:var(--blue-dark);color:white;border-radius:var(--radius-lg);padding:1.75rem 1.5rem;text-align:center;margin-bottom:1.5rem;}
+.summary-header h2{font-size:22px;font-weight:normal;font-style:italic;margin-bottom:4px;}
+.summary-header p{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.75);}
+.score-banner{display:flex;align-items:center;justify-content:center;gap:2rem;background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-block{text-align:center;}
+.score-big{font-size:52px;font-family:Arial,sans-serif;font-weight:bold;line-height:1;}
+.score-big.pass{color:var(--teal);}
+.score-big.fail{color:var(--red);}
+.score-label{font-family:Arial,sans-serif;font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.score-divider{width:1px;height:60px;background:var(--gray-border);}
+.outcome-badge{display:inline-block;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:var(--radius-md);padding:6px 16px;}
+.outcome-badge.completed{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--teal);}
+.outcome-badge.ended{background:var(--red-light);color:var(--red);border:1px solid var(--red);}
+.outcome-badge.partial{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber);}
+.stamp-block{border:2px solid var(--teal);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;margin-bottom:1.5rem;background:var(--teal-light);}
+.stamp-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-dark);margin-bottom:6px;}
+.stamp-name{font-size:22px;color:var(--teal-dark);margin-bottom:4px;}
+.stamp-date{font-family:Arial,sans-serif;font-size:13px;color:var(--teal-dark);}
+.name-input-row{background:white;border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;}
+.name-input-row label{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;}
+.name-input-row input{width:100%;border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:9px 12px;font-size:15px;font-family:Georgia,serif;color:var(--text-primary);background:white;}
+.name-input-row input:focus{outline:none;border-color:var(--blue-mid);}
+.submit-instructions{background:var(--amber-light);border:1px solid var(--amber);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-family:Arial,sans-serif;font-size:14px;color:var(--amber-dark);line-height:1.7;}
+.summary-section{margin-bottom:1.75rem;}
+.summary-section-title{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);border-bottom:.5px solid var(--gray-border);padding-bottom:6px;margin-bottom:1rem;}
+.sq-block{border:1px solid var(--gray-border);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:10px;background:white;}
+.sq-block.correct{border-left:4px solid var(--teal);}
+.sq-block.incorrect{border-left:4px solid var(--red);}
+.sq-block.partial{border-left:4px solid var(--amber);}
+.sq-block.notreached{border-left:4px solid var(--gray-border);background:#fafaf8;}
+.sq-status{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sq-status.c{color:var(--teal-dark);}
+.sq-status.i{color:var(--red);}
+.sq-status.p{color:var(--amber-dark);}
+.sq-status.n{color:var(--text-secondary);}
+.sq-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;float:right;}
+.sq-question{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;}
+.sq-answer{font-family:Arial,sans-serif;font-size:14px;margin-bottom:4px;}
+.sq-correct-ans{color:var(--teal-dark);}
+.sq-expl{font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:8px;border-top:.5px solid var(--gray-border);padding-top:8px;}
+.locked-notice{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius-md);padding:10px 14px;font-family:Arial,sans-serif;font-size:13px;color:var(--red);text-align:center;margin-bottom:1.5rem;}
+@media print{
+  .page-header,.progress-wrap,.nav-row,.submit-instructions,.name-input-row,.locked-notice{display:none!important;}
+  .phase{display:none!important;}
+  #phase-summary{display:block!important;}
+  body{background:white;}
+  .summary-header,.stamp-block{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Human Physiology — Undergraduate Nursing | Case Study 2 of 5</div>
+  <h1>The Returning Doctor</h1>
+  <div class="tagline">A Boston ER physician back from the Congo faces a diagnosis no one else in the room is thinking about</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your progress — choose wisely. Some decisions cannot be undone.</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+      <div class="prog-seg" id="ps6"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 0 — OPENING -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">Boston City Hospital Emergency Department &nbsp;—&nbsp; 7:48 AM, January</div>
+    <div class="scene-card">
+      <div class="scene-label">Arrival</div>
+      <div class="scene-text">The automatic doors slide open and a blast of January air follows you in. You are Dr. Amara Osei, 34, emergency medicine physician. You have just returned from six weeks with MedReach International in the Democratic Republic of Congo — your third deployment in four years. Your scrubs are freshly washed. Your coffee is still hot. It is your first shift back.</div>
+    </div>
+    <div class="dialogue"><div class="dialogue-speaker">Dr. Marcus Webb — Charge physician and friend</div><div class="dialogue-text">"Amara! You're back! Please tell me you brought actual coffee from somewhere that isn't this hospital."</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Just Dunkin'. Congo didn't exactly have a drive-through. Six weeks of instant coffee and I am a changed person."</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Dr. Webb</div><div class="dialogue-text">"How was it? Really?"</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Hard. Good. We were in three rural villages outside Kinshasa — resource-limited doesn't begin to cover it. You learn to diagnose with your eyes and your hands because that's all you have. Saw things I haven't seen since medical school. Some things I'd never seen outside of a textbook."</div></div>
+    <div class="dialogue"><div class="dialogue-speaker">Dr. Webb</div><div class="dialogue-text">"Glad you're back. Fair warning — it's a mess today. Cold snap, half the city is sick, two traumas inbound. The waiting room is packed. Some people in there aren't even sick — just cold."</div></div>
+    <div class="scene-card warn">
+      <div class="scene-label">The waiting room — 7:52 AM</div>
+      <div class="scene-text">You glance through the glass at the waiting room. Standing room only. A man in his 70s dozes in a corner chair. A young woman in her mid-twenties bounces a toddler on her knee. A college-aged kid in a university hoodie sneezes into his elbow. Fourteen patients waiting. Two traumas incoming. Three nurses on the floor instead of five.</div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-label">One family stands out</div>
+      <div class="scene-text">Near the back sits a family of four. A man and woman, both mid-thirties, look tired but composed. A boy of about twelve sits slumped against the wall. A girl who looks around six is leaning against her mother, eyes half-closed. They have been there since before your shift started. They are not drawing attention to themselves. They are simply waiting, the way people who are used to waiting do.</div>
+    </div>
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 1 — Triage Decision &nbsp;|&nbsp; <span style="color:var(--amber-dark);">2 points</span></div>
+      <div class="q-text">Q1. Two traumas are incoming and the ER is critically understaffed. The triage nurse flags the family but notes the children appear stable — no acute distress visible. Three other patients look more acutely ill. What do you do?</div>
+      <button class="option-btn" onclick="b1(this,'A')">A. Flag the family for immediate assessment in a private room — something about the children's appearance concerns you</button>
+      <button class="option-btn" onclick="b1(this,'B')">B. Traumas take priority — ask the triage nurse to keep a close eye on the family and move them up once the traumas stabilize</button>
+      <button class="option-btn" onclick="b1(this,'C')">C. The children appear stable, the family is calm, and resources are already stretched — continue managing the board and get to them when possible</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p1" onclick="goPhase(1)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 — HISTORY TAKING -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Examination Room 4 &nbsp;—&nbsp; 9:15 AM</div>
+    <div class="scene-card" id="triage-note" style="display:none;">
+      <div class="scene-label" id="triage-note-label">Consequence of your triage decision</div>
+      <div class="scene-text" id="triage-note-text"></div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-label">Meeting the family</div>
+      <div class="scene-text">The family has been brought to an exam room. The father introduces himself as David Marchand, his wife as Claire. Their son is Noah, 12. Their daughter is Lily, 6. Up close, both children look worse than in the waiting room. Noah is lethargic, flushed. Lily is curled against her mother, breathing rapidly. Both have visible rashes — raised, firm lesions scattered across their faces, arms, and torsos. The lesions appear to be at roughly the same stage of development on both children.</div>
+    </div>
+    <div class="vitals-grid">
+      <div class="vital-card"><div class="vital-label">Noah — Temp</div><div class="vital-value">38.9°C</div><div class="vital-note">elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Noah — HR</div><div class="vital-value">101 bpm</div><div class="vital-note">elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Noah — Resp</div><div class="vital-value">20/min</div></div>
+      <div class="vital-card"><div class="vital-label">Lily — Temp</div><div class="vital-value">39.6°C</div><div class="vital-note danger">high fever</div></div>
+      <div class="vital-card"><div class="vital-label">Lily — HR</div><div class="vital-value">118 bpm</div><div class="vital-note danger">elevated</div></div>
+      <div class="vital-card"><div class="vital-label">Lily — Resp</div><div class="vital-value">26/min</div><div class="vital-note danger">elevated</div></div>
+    </div>
+    <div class="scene-card warn">
+      <div class="scene-label">Physical examination</div>
+      <div class="scene-text">Both children have discrete, raised, firm papules progressing to vesicles. The lesions are deep-seated, almost embedded in the skin rather than superficial. Critically, all lesions on each child appear to be at the same stage of development. There is significant lymphadenopathy — swollen lymph nodes — palpable in both children. Neither parent shows any skin findings. Both parents appear completely well.</div>
+    </div>
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 2 — History Taking &nbsp;|&nbsp; <span style="color:var(--amber-dark);">5 points</span></div>
+      <div class="q-text">Q2. You have examined both children and noted the rash characteristics. What is the most critical next step in your history taking?</div>
+      <button class="option-btn" onclick="b2(this,'A')">A. Ask specifically about recent travel history, any contact with animals, and the vaccination history of both children and parents</button>
+      <button class="option-btn" onclick="b2(this,'B')">B. Focus on when the rash first appeared, whether it is itchy, and whether any children at school have been sick recently</button>
+      <button class="option-btn" onclick="b2(this,'C')">C. Order a standard viral panel and skin culture immediately — the history can be completed while waiting for results</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p2" onclick="goPhase(2)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — CONSEQUENCE AND RECOGNITION -->
+  <div id="phase-2" class="phase">
+
+    <div id="lily-dies" style="display:none;">
+      <div class="consequence-screen">
+        <h2>Lily Marchand &nbsp;&middot;&nbsp; Age 6</h2>
+        <p>Without the travel history to guide clinical urgency, Lily's deteriorating condition is managed as a severe viral illness of unknown origin. Standard workup takes time. Antiviral protocols specific to her pathogen are not initiated. By the time the picture becomes clearer, Lily has developed severe complications — encephalitis and respiratory failure. She is transferred to the pediatric ICU.</p>
+        <p>She does not survive.</p>
+        <div class="physio-box">
+          <div class="physio-label">What happened physiologically</div>
+          <p style="margin:0;color:rgba(255,255,255,.85);font-family:Arial,sans-serif;font-size:14px;line-height:1.75;">The orthopoxvirus replicates rapidly in immunologically naive hosts. The virus spreads from the initial infection site through the lymphatic system into the bloodstream — viremia — seeding organs including the brain and lungs. In young children, the immune response lacks the memory cells that allow faster antibody production against this specific pathogen. The high fever reflects the body's systemic inflammatory response, but without targeted antiviral support, viral replication outpaces immune control. In Lily's case the virus crossed the blood-brain barrier causing viral encephalitis — inflammation of brain tissue — and simultaneously damaged pulmonary epithelium, leading to respiratory failure. Her age, low body weight, and complete immunological naivety made her the most vulnerable person in that family.</p>
+        </div>
+      </div>
+      <div class="scene-card alert">
+        <div class="scene-label">In the aftermath — examination room 4</div>
+        <div class="scene-text">You are still in the room with Noah and the Marchand family. Lily has been taken upstairs. The weight of what happened settles over you. You turn back to Noah, who is watching you with frightened eyes. You ask the question you should have asked an hour ago.</div>
+      </div>
+      <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Mr. and Mrs. Marchand — I need to ask. Have your children traveled anywhere recently? Outside the country?"</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">David Marchand — Father</div><div class="dialogue-text">"Yes — we just got back two and a half weeks ago. I work with a peace organization. We were in the DRC for three months. Rural area, northeast of Kinshasa. We were around a lot of people. The children were with us the whole time."</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Were you and your wife vaccinated against smallpox as children?"</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">Claire Marchand — Mother</div><div class="dialogue-text">"Yes, both of us. We're in our thirties — we received it as children. The children never did, of course."</div></div>
+      <div class="memory-flash">
+        <div class="memory-label">Dr. Osei's memory — a village outside Kinshasa, five weeks ago</div>
+        <div class="memory-text">A child brought in by her grandmother. Firm lesions, all the same stage. Lymph nodes like small stones under the skin. The grandmother had a circular scar on her upper arm — the old vaccination mark. The child had nothing like it. You had diagnosed it from across the room. You had known immediately what it was. You had seen it twice more before leaving the Congo. And now you know again. You knew before the history. You simply did not ask. The knowledge was there. The question was not.</div>
+      </div>
+    </div>
+
+    <div id="lily-lives" style="display:none;">
+      <div class="dialogue"><div class="dialogue-speaker">David Marchand — Father</div><div class="dialogue-text">"Travel — yes. We just got back about two and a half weeks ago. I work with a peace organization. We were in the DRC for three months, rural villages northeast of Kinshasa. We were around a lot of local families, markets, community gatherings. The children were with us the entire time."</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Any contact with animals? Rodents, monkeys, anything like that?"</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">David Marchand</div><div class="dialogue-text">"Probably, yes. There were animals everywhere. Markets. The kids were curious, you know how kids are."</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">Dr. Osei — You</div><div class="dialogue-text">"Were you and your wife vaccinated against smallpox as children?"</div></div>
+      <div class="dialogue"><div class="dialogue-speaker">Claire Marchand — Mother</div><div class="dialogue-text">"Yes, we both were. We're in our thirties. The children never received it — it's not part of the schedule anymore."</div></div>
+      <div class="memory-flash">
+        <div class="memory-label">Dr. Osei's memory — a village outside Kinshasa, five weeks ago</div>
+        <div class="memory-text">A child brought in by her grandmother. Firm lesions, all the same stage of development. Lymph nodes swollen like small stones under the skin. The grandmother had a faint circular scar on her upper arm — the old smallpox vaccination mark. The child had nothing like it. You had known immediately what it was. You saw it twice more before leaving the Congo. And now, standing in this exam room in Boston with the DRC just two and a half weeks behind this family — you know exactly what you are looking at.</div>
+      </div>
+      <div class="scene-card ok">
+        <div class="scene-label">The picture comes together</div>
+        <div class="scene-text">The travel history, the animal contact, the unvaccinated children, the vaccinated asymptomatic parents, the deep synchronous lesions, the pronounced lymphadenopathy — it all aligns. You initiate isolation protocols for both children immediately, citing suspected infectious disease pending confirmation. You tell the charge nurse to hold the room.</div>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">Branch 3 — Vaccine Immunology &nbsp;|&nbsp; <span style="color:var(--amber-dark);">4 points</span></div>
+      <div class="q-text">Q3. The parents' smallpox vaccination status explains why they are asymptomatic while both unvaccinated children are ill. Which statement best explains this finding physiologically?</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="b3(this,'A',true)">A. The smallpox vaccine provides cross-protective immunity against related orthopoxviruses — the parents' memory B cells and T cells recognize similar viral antigens and mount a rapid immune response, preventing illness</button>
+        <button class="tf-btn" onclick="b3(this,'B',false)">B. The parents are immune because adults naturally develop resistance to poxviruses through repeated low-level environmental exposure over time</button>
+      </div>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p3" onclick="goPhase(3)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 — DIAGNOSIS -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">Examination Room 4 &nbsp;—&nbsp; 10:05 AM</div>
+    <div class="scene-card">
+      <div class="scene-label">Narrowing the diagnosis</div>
+      <div class="scene-text">You review the full clinical picture: fever preceding rash, deep-seated firm lesions all at the same stage, significant lymphadenopathy, travel from an endemic region in Central Africa, unvaccinated children, vaccinated and completely asymptomatic parents. You need to commit to a working diagnosis. Lab confirmation will take hours. You have to act on clinical reasoning now.</div>
+    </div>
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 4 — Working Diagnosis &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q4. What is your working diagnosis?</div>
+      <button class="option-btn" onclick="b4(this,'A')">A. Smallpox (variola) — the lesion pattern and the parents' vaccination cross-protection is consistent with a re-emerged smallpox case</button>
+      <button class="option-btn" onclick="b4(this,'B')">B. Mpox (monkeypox) — travel from an endemic region in the DRC, animal contact, unvaccinated children, vaccinated asymptomatic parents, and the characteristic synchronous deep lesion pattern all point to an orthopoxvirus consistent with mpox</button>
+      <button class="option-btn" onclick="b4(this,'C')">C. Varicella (chickenpox) — the rash and fever are consistent, and the parents likely have natural immunity from prior childhood infection</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p4" onclick="goPhase(4)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 — MAGNITUDE -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">Boston City Hospital ER &nbsp;—&nbsp; 10:18 AM</div>
+    <div class="magnitude-scene">
+      <div class="magnitude-label">The waiting room — seen with new eyes</div>
+      <div class="magnitude-text">You step out of Exam Room 4 and pause at the glass partition. The waiting room is still full. You look at it differently now. Mpox spreads through prolonged close contact — respiratory droplets, direct contact with lesions, contaminated surfaces. This family has been sitting in that room for over two hours.</div>
+    </div>
+    <div id="exposed-block" style="display:none;">
+      <div class="magnitude-scene" style="margin-top:1rem;">
+        <div class="magnitude-label">People who sat near the Marchand family during their extended wait</div>
+        <div class="magnitude-text" style="margin-bottom:1rem;">Because the family waited for an extended period without isolation, three individuals had significant close contact with them:</div>
+        <div>
+          <span class="exposed-tag">Harold Simms, 74 — sat directly beside the family for 90 minutes</span>
+          <span class="exposed-tag">Diane Torres, 26 — young mother with toddler, shared the row behind them</span>
+          <span class="exposed-tag">Ryan Cho, 21 — college student, sat across from the family, shook Noah's hand</span>
+        </div>
+        <div class="magnitude-text" style="margin-top:1rem;">All three are still in the waiting room. None of them know what they may have been exposed to. They will need to be identified, contacted, and monitored. This is the consequence of the delay.</div>
+      </div>
+    </div>
+    <div class="scene-card alert" style="margin-top:1.25rem;">
+      <div class="scene-label">The weight of the situation</div>
+      <div class="scene-text">A busy ER. Dozens of people. A potentially infectious family who has been in the open waiting room. A disease most clinicians in this building have never seen in person. You are the only person here right now who knows what this might be. What you do in the next five minutes matters enormously.</div>
+    </div>
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 5 — Isolation Decision &nbsp;|&nbsp; <span style="color:var(--amber-dark);">4 points</span></div>
+      <div class="q-text">Q5. You need to act immediately. What is your first action?</div>
+      <button class="option-btn" onclick="b5(this,'A')">A. Immediately alert the charge physician, initiate full isolation precautions for the Marchand family, clear and ventilate the waiting room, and begin identifying all individuals who had prolonged contact with the family</button>
+      <button class="option-btn" onclick="b5(this,'B')">B. Isolate the Marchand children first, then finish your two other waiting patients before escalating — you want to be more certain before creating potential panic in the ER</button>
+      <button class="option-btn" onclick="b5(this,'C')">C. Quietly move the family to a back hallway and wait for lab confirmation before taking any formal isolation steps — a false alarm would be disruptive and damaging to the hospital</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p5" onclick="goPhase(5)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — PUBLIC HEALTH -->
+  <div id="phase-5" class="phase">
+    <div class="phase-heading">Boston City Hospital — Charge Office &nbsp;—&nbsp; 10:31 AM</div>
+    <div class="scene-card ok">
+      <div class="scene-label">Isolation in place</div>
+      <div class="scene-text">The Marchand family is in a negative pressure isolation room. The waiting room has been cleared and ventilated. Contact tracing for individuals who sat near the family has begun. Dr. Webb is briefed. The hospital infection control officer has been paged. Now you need to make the calls that go beyond this building.</div>
+    </div>
+    <div class="question-block">
+      <div class="q-tag tag-mc">Branch 6 — Public Health Reporting &nbsp;|&nbsp; <span style="color:var(--amber-dark);">3 points</span></div>
+      <div class="q-text">Q6. What is the correct public health reporting action?</div>
+      <button class="option-btn" onclick="b6(this,'A')">A. Contact the Massachusetts Department of Public Health and the CDC Emergency Operations Center immediately — mpox is a nationally notifiable disease and a suspected case in a returning traveler requires immediate reporting regardless of lab confirmation</button>
+      <button class="option-btn" onclick="b6(this,'B')">B. Notify hospital administration and legal counsel first — they will coordinate public health reporting through the appropriate institutional channels</button>
+      <button class="option-btn" onclick="b6(this,'C')">C. Wait for PCR confirmation before making any public health calls — reporting an unconfirmed case could cause unnecessary public alarm and damage hospital reputation</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+    <div class="question-block" id="q7-block" style="display:none;">
+      <div class="q-tag tag-tf">Branch 7 — Physiological Understanding &nbsp;|&nbsp; <span style="color:var(--amber-dark);">2 points</span></div>
+      <div class="q-text">Q7. Mpox lesions are deep-seated and firm, and all appear at the same stage of development on a given patient. This synchronized staging is physiologically significant because it indicates the virus entered the bloodstream in a single viremic event — seeding the skin simultaneously across the body — unlike chickenpox, where lesions appear in successive waves from continuous viral shedding.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="b7(this,'A',true)">True — synchronized lesion staging reflects a single viremic seeding event and is a key clinical feature distinguishing mpox from varicella</button>
+        <button class="tf-btn" onclick="b7(this,'B',false)">False — lesion staging is determined by the patient's skin type and thickness and has no diagnostic significance</button>
+      </div>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-summary" onclick="buildSummary(null)" style="display:none;">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY PAGE -->
+  <div id="phase-summary" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers and score cannot be changed.</div>
+    <div class="summary-header">
+      <h2>Case Study 2 — Submission Summary</h2>
+      <p>Human Physiology &nbsp;|&nbsp; BIO 208 &nbsp;|&nbsp; The Returning Doctor</p>
+    </div>
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-display">—</div>
+        <div class="score-label">Points earned</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div style="font-size:28px;font-family:Arial,sans-serif;font-weight:bold;" id="score-pct-display">—</div>
+        <div class="score-label">Out of 20</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div id="outcome-label" class="outcome-badge">—</div>
+      </div>
+    </div>
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment.
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">All decisions — your complete path through the case</div>
+      <div id="summary-questions"></div>
+    </div>
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:var(--text-secondary);">Case study locked and complete</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var score = 0;
+var scenarioEnded = false;
+var lilyDied = false;
+var triageWrong = false;
+var alog = {};
+
+var qdefs = {
+  q1:{text:'Q1. Triage decision — how do you prioritize the Marchand family?',pts:2,
+    cl:'A — Flag the family for immediate assessment in a private room',
+    exp:'Early isolation of a potentially infectious family protects other patients. In emergency medicine, any unusual presentation in a returning traveler warrants prompt assessment. The appearance of the lesions and the children\'s lethargy should have triggered concern. Flagging the family promptly limits their time in the open waiting room and accelerates diagnosis.'},
+  q2:{text:'Q2. History taking — what is the most critical next step?',pts:5,
+    cl:'A — Ask specifically about recent travel history, animal contact, and vaccination history of the children and parents',
+    exp:'Travel history is the single most important question in this presentation. The combination of febrile illness with this specific lesion pattern makes geographic exposure history essential. In resource-limited settings, history IS the diagnostic tool. Skipping to labs without this history delays the critical clinical pivot that changes everything about how this case is managed.'},
+  q3:{text:'Q3. Why are the vaccinated parents asymptomatic while both unvaccinated children are ill?',pts:4,
+    cl:'A — The smallpox vaccine provides cross-protective immunity through immunological memory — parents\' memory B and T cells recognize similar orthopoxvirus antigens',
+    exp:'The smallpox vaccine (vaccinia virus) induces long-lasting immunological memory. Memory B cells produce cross-reactive antibodies and memory T cells recognize shared antigens across the orthopoxvirus family including mpox. When exposed, vaccinated individuals mount a rapid anamnestic immune response that controls viral replication before illness develops. Natural adult resistance to poxviruses does not exist — unvaccinated adults are equally susceptible.'},
+  q4:{text:'Q4. Working diagnosis',pts:3,
+    cl:'B — Mpox — travel from endemic DRC, animal contact, unvaccinated children, vaccinated asymptomatic parents, characteristic synchronous deep lesion pattern',
+    exp:'Smallpox (variola) was eradicated in 1980 and exists only in two secured laboratory facilities worldwide. Varicella (chickenpox) lesions are superficial, intensely itchy, and appear in successive waves at different stages simultaneously — the opposite of what is seen here. Mpox fits all clinical and epidemiological criteria: endemic region travel, animal contact, orthopoxvirus cross-protection in vaccinated parents, deep firm synchronous lesions, and prominent lymphadenopathy.'},
+  q5:{text:'Q5. Isolation decision — first action in the ER',pts:4,
+    cl:'A — Immediately alert charge physician, initiate full isolation, clear and ventilate waiting room, begin contact identification',
+    exp:'In a suspected high-consequence infectious disease case the correct sequence is: isolate immediately, escalate immediately, identify contacts immediately. Waiting for confirmation, finishing other patients first, or acting quietly all delay containment and increase exposure risk. The precautionary principle applies — act on clinical suspicion, not confirmed diagnosis. Every minute the waiting room is not cleared is a minute of continued potential exposure for dozens of people.'},
+  q6:{text:'Q6. Public health reporting',pts:3,
+    cl:'A — Contact Massachusetts DPH and CDC Emergency Operations Center immediately — mpox is nationally notifiable regardless of lab confirmation',
+    exp:'Mpox is a nationally notifiable disease. Clinicians have an independent legal obligation to report suspected cases to public health authorities — confirmed diagnosis is not required. The CDC Emergency Operations Center exists precisely for this. Routing through hospital administration introduces delay. Waiting for lab confirmation is a legal and ethical violation of reporting obligations that delays contact tracing and potential prophylaxis for exposed individuals.'},
+  q7:{text:'Q7. Physiological significance of synchronized lesion staging in mpox versus varicella',pts:2,
+    cl:'True — synchronized lesion staging reflects a single viremic seeding event and is a key clinical feature distinguishing mpox from varicella',
+    exp:'In mpox the virus enters through mucous membranes or broken skin, replicates at the site and in regional lymph nodes, then enters the bloodstream in a single viremic wave — causing lesions to appear across the body simultaneously and progress through stages together. In varicella the virus sheds continuously from the respiratory tract seeding the skin in multiple waves, producing the characteristic mixed-stage appearance. This single clinical detail — lesion stage uniformity — is one of the most reliable features distinguishing the two diseases.'}
+};
+
+function lockBtns(parent, selector) {
+  parent.querySelectorAll(selector).forEach(function(b){b.disabled=true;});
+}
+
+function b1(btn, choice) {
+  lockBtns(btn.parentElement, '.option-btn');
+  var fb = document.getElementById('fb-q1');
+  if (choice==='A') {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Good instinct. Flagging the family promptly limits their time in the open waiting room and gets you in front of what turns out to be a serious situation sooner. +2 points.';
+    score+=2; alog.q1={sel:'A — Flagged for immediate assessment',correct:true,pts:2,max:2};
+  } else {
+    btn.classList.add('plausible');
+    triageWrong=true;
+    fb.className='feedback show-plausible';
+    var msg = choice==='B'
+      ? 'A reasonable triage call given the trauma load. However, the family will sit in the open waiting room for an extended period. Three people nearby will have significant exposure time. You will see this play out later. No points for this branch.'
+      : 'Also a reasonable call in a stretched ER — the family does appear stable on the surface. However, the family will remain in the crowded waiting room the longest. Three nearby patients will have the most exposure time. No points for this branch.';
+    fb.textContent=msg;
+    alog.q1={sel:(choice==='B'?'B — Prioritized traumas, asked nurse to monitor':'C — Continued managing board, family waited'),correct:false,pts:0,max:2,plausible:true};
+  }
+  document.getElementById('nav-p1').style.display='inline-block';
+}
+
+function b2(btn, choice) {
+  lockBtns(btn.parentElement, '.option-btn');
+  var fb = document.getElementById('fb-q2');
+  if (choice==='A') {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. Travel history, animal contact, and vaccination status are the three most critical pieces of information for this presentation. This history changes everything. +5 points.';
+    score+=5; lilyDied=false;
+    alog.q2={sel:'A — Travel history, animal contact, vaccination status',correct:true,pts:5,max:5};
+  } else if (choice==='B') {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='These are reasonable questions for a standard rash presentation, but they miss the most critical contextual information. Without the travel history, the clinical urgency for Lily is not established in time. The consequences of this choice are significant and irreversible. No points for this branch.';
+    lilyDied=true;
+    alog.q2={sel:'B — Focused on rash onset, itching, and school contacts',correct:false,pts:0,max:5,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Ordering labs before completing a proper history in a febrile rash illness with potential travel exposure is a critical error. In a resource-limited or high-consequence setting, history comes first. Scenario ended.';
+    alog.q2={sel:'C — Ordered labs, deferred history',correct:false,pts:0,max:5,ended:true};
+    endScenario('You ordered diagnostic testing before completing a travel and exposure history. In a febrile illness with this lesion pattern in a potential returning traveler, history is the primary diagnostic tool. Lab results take hours. A proper travel history takes five minutes and would have immediately changed your clinical approach. Without it, critical time was lost and the clinical picture remained incomplete.');
+    return;
+  }
+  document.getElementById('nav-p2').style.display='inline-block';
+}
+
+function b3(btn, choice, isCorrect) {
+  lockBtns(btn.parentElement, '.tf-btn');
+  var fb = document.getElementById('fb-q3');
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. The smallpox vaccine uses vaccinia virus to induce immunological memory. Because orthopoxviruses share conserved surface antigens, memory B and T cells generated by the smallpox vaccine cross-react with mpox antigens. This cross-protective immunity allows vaccinated individuals to control the infection rapidly before illness develops. +4 points.';
+    score+=4; alog.q3={sel:'A — Cross-protective immunity through immunological memory',correct:true,pts:4,max:4};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Adults do not develop natural resistance to poxviruses through environmental exposure. The parents\' immunity is entirely from childhood smallpox vaccination. This misunderstanding of vaccine immunology is a critical error. Scenario ended.';
+    alog.q3={sel:'B — Adults develop natural resistance through environmental exposure',correct:false,pts:0,max:4,ended:true};
+    endScenario('Adults do not naturally develop resistance to poxviruses. The parents\' immunity is entirely attributable to their childhood smallpox vaccination — specifically the cross-protective immunological memory it induced. Misidentifying the source of immunity reflects a fundamental misunderstanding of vaccine-induced memory versus natural acquired immunity, a distinction critical for understanding disease spread in unvaccinated populations.');
+    return;
+  }
+  document.getElementById('nav-p3').style.display='inline-block';
+}
+
+function b4(btn, choice) {
+  lockBtns(btn.parentElement, '.option-btn');
+  var fb = document.getElementById('fb-q4');
+  if (choice==='B') {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. All epidemiological and clinical criteria point to mpox. Travel from an endemic region, animal contact, orthopoxvirus cross-protection in vaccinated parents, firm synchronous deep lesions, and prominent lymphadenopathy. This is your working diagnosis. +3 points.';
+    score+=3; alog.q4={sel:'B — Mpox',correct:true,pts:3,max:3};
+  } else if (choice==='A') {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Smallpox was eradicated in 1980 and does not circulate anywhere in the world. While the clinical picture of mpox closely resembles historical smallpox descriptions — and your instinct to think orthopoxvirus is correct — a diagnosis of variola is virtually impossible outside a deliberate release event. The correct diagnosis here is mpox. -1 point for the misidentification, but the clinical management steps are similar enough to continue.';
+    score=Math.max(0,score-1); alog.q4={sel:'A — Smallpox (variola)',correct:false,pts:-1,max:3,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Varicella does not fit this clinical picture. The lesions in chickenpox are superficial, intensely itchy, and appear in multiple stages simultaneously — the opposite of what is seen here. Varicella does not cause the lymphadenopathy seen in these children. Most critically, varicella does not explain the parents\' immunity pattern or the travel history. Scenario ended.';
+    alog.q4={sel:'C — Varicella (chickenpox)',correct:false,pts:0,max:3,ended:true};
+    endScenario('Diagnosing this as varicella and proceeding without isolation or public health reporting would allow a potentially infectious family to leave the ER. The clinical differences between varicella and mpox — lesion depth, synchronized staging, lymphadenopathy, travel history, and the parents\' vaccination immunity pattern — are exactly the features a clinician must recognize to act correctly and protect both the patient and the public.');
+    return;
+  }
+  document.getElementById('nav-p4').style.display='inline-block';
+}
+
+function b5(btn, choice) {
+  lockBtns(btn.parentElement, '.option-btn');
+  var fb = document.getElementById('fb-q5');
+  if (choice==='A') {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. Immediate comprehensive action is the only appropriate response. Alert, isolate, clear, trace — simultaneously if possible. This is the correct sequence for a suspected high-consequence infectious disease in a public healthcare setting. +4 points.';
+    score+=4; alog.q5={sel:'A — Immediate full alert, isolation, waiting room cleared, contacts identified',correct:true,pts:4,max:4};
+  } else if (choice==='B') {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Isolating the children is the right first instinct, but delaying escalation to finish other patients is a significant error. Every minute the waiting room is not cleared is continued potential exposure for dozens of people. In suspected high-consequence infectious disease, escalation is immediate — it does not wait for a convenient moment. -2 points.';
+    score=Math.max(0,score-2); alog.q5={sel:'B — Isolated children, delayed escalation to finish other patients',correct:false,pts:-2,max:4,plausible:true};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Waiting for lab confirmation before initiating formal isolation allowed continued exposure of the waiting room. This is a critical failure of infection control protocol. Scenario ended.';
+    alog.q5={sel:'C — Moved family quietly, waited for lab confirmation',correct:false,pts:0,max:4,ended:true};
+    endScenario('In a suspected high-consequence infectious disease case, waiting for laboratory confirmation before initiating isolation is never the correct approach. The precautionary principle requires action on clinical suspicion. By the time PCR results return, the window for effective contact containment may have already closed. A false alarm with rapid correction is infinitely preferable to a delayed response to a real outbreak.');
+    return;
+  }
+  document.getElementById('nav-p5').style.display='inline-block';
+}
+
+function b6(btn, choice) {
+  lockBtns(btn.parentElement, '.option-btn');
+  var fb = document.getElementById('fb-q6');
+  if (choice==='A') {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. Mpox is a nationally notifiable disease. Clinicians have a legal obligation to report suspected cases immediately — confirmed diagnosis is not required. The CDC Emergency Operations Center exists exactly for this situation. +3 points.';
+    score+=3; alog.q6={sel:'A — Contacted Massachusetts DPH and CDC immediately',correct:true,pts:3,max:3};
+    document.getElementById('q7-block').style.display='block';
+  } else if (choice==='B') {
+    btn.classList.add('plausible');
+    fb.className='feedback show-plausible';
+    fb.textContent='Notifying administration is appropriate but is not a substitute for direct public health reporting. Clinicians have an independent legal obligation — this cannot be delegated to administration. Routing through institutional channels introduces delay. -1 point.';
+    score=Math.max(0,score-1); alog.q6={sel:'B — Notified hospital administration only',correct:false,pts:-1,max:3,plausible:true};
+    document.getElementById('q7-block').style.display='block';
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Waiting for PCR confirmation before reporting a suspected mpox case violates your legal reporting obligations and delays critical public health response. Scenario ended.';
+    alog.q6={sel:'C — Waited for lab confirmation before any public health calls',correct:false,pts:0,max:3,ended:true};
+    endScenario('Mpox is a nationally notifiable disease. Clinicians are legally required to report suspected cases immediately upon clinical suspicion — not after laboratory confirmation. Waiting for PCR results delays contact tracing, delays potential prophylaxis for exposed individuals, and delays the public health response essential to preventing broader spread. The reporting obligation exists independent of diagnostic certainty.');
+    return;
+  }
+}
+
+function b7(btn, choice, isCorrect) {
+  lockBtns(btn.parentElement, '.tf-btn');
+  var fb = document.getElementById('fb-q7');
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. The synchronized lesion staging in mpox reflects a single viremic seeding event — the virus enters the bloodstream at once and seeds the skin simultaneously. This contrasts with varicella where continuous respiratory viral shedding seeds the skin in successive waves, producing lesions at multiple stages at the same time. Recognizing this distinction is a critical clinical skill. +2 points.';
+    score+=2; alog.q7={sel:'True — synchronized staging reflects single viremic event',correct:true,pts:2,max:2};
+  } else {
+    btn.classList.add('ended');
+    fb.className='feedback show-ended';
+    fb.textContent='Lesion staging is diagnostically significant and is not determined by skin type. This misunderstanding could lead to misdiagnosis. Scenario ended.';
+    alog.q7={sel:'False — lesion staging determined by skin type',correct:false,pts:0,max:2,ended:true};
+    endScenario('Lesion stage uniformity is one of the most clinically reliable features distinguishing mpox from varicella. It reflects the underlying viral pathophysiology — a single viremic seeding event versus continuous viral shedding. Dismissing this as a skin-type variation would undermine accurate diagnosis and appropriate patient management in all future similar presentations.');
+    return;
+  }
+  document.getElementById('nav-summary').style.display='inline-block';
+}
+
+function endScenario(reason) {
+  scenarioEnded=true;
+  setTimeout(function(){buildSummary(reason);},600);
+}
+
+function goPhase(n) {
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5','phase-summary'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+
+  if (n===2) {
+    document.getElementById('phase-2').classList.add('active');
+    document.getElementById(lilyDied?'lily-dies':'lily-lives').style.display='block';
+    document.getElementById(lilyDied?'lily-lives':'lily-dies').style.display='none';
+  } else if (n===4) {
+    document.getElementById('phase-4').classList.add('active');
+    if (triageWrong) document.getElementById('exposed-block').style.display='block';
+  } else {
+    if (ids[n]) document.getElementById(ids[n]).classList.add('active');
+  }
+
+  document.querySelectorAll('.prog-seg').forEach(function(s,i){
+    s.classList.remove('done','active');
+    if(i<n) s.classList.add('done');
+    if(i===n) s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function buildSummary(endReason) {
+  var qids=['q1','q2','q3','q4','q5','q6','q7'];
+  var html='';
+
+  if (endReason) {
+    html+='<div class="sq-block incorrect" style="margin-bottom:1.5rem;">';
+    html+='<div class="sq-status i">&#10007; Scenario ended here</div>';
+    html+='<div class="sq-question">'+endReason+'</div>';
+    html+='</div>';
+  }
+
+  qids.forEach(function(qid){
+    var def=qdefs[qid];
+    var log=alog[qid];
+    if (!log) {
+      html+='<div class="sq-block notreached">';
+      html+='<div class="sq-status n">&#8212; Not reached <span class="sq-pts" style="color:var(--text-secondary);">0 / '+def.pts+' pts</span></div>';
+      html+='<div class="sq-question">'+def.text+'</div>';
+      html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div>';
+      html+='<div class="sq-expl">'+def.exp+'</div>';
+      html+='</div>';
+      return;
+    }
+
+    var bc=log.correct?'correct':(log.plausible?'partial':'incorrect');
+    var sc=log.correct?'c':(log.plausible?'p':'i');
+    var st=log.correct?'&#10003; Correct':(log.plausible?'&#9651; Plausible — points deducted':(log.ended?'&#10007; Scenario-ending error':'&#10007; Incorrect'));
+    var ptsStr=log.correct?('+'+log.max+' / '+log.max+' pts'):(log.pts<0?(log.pts+' pts deducted'):('0 / '+log.max+' pts'));
+    var ptsCls=log.correct?'style="color:var(--teal-dark);"':(log.plausible?'style="color:var(--amber-dark);"':'style="color:var(--red);"');
+
+    html+='<div class="sq-block '+bc+'">';
+    html+='<div class="sq-status '+sc+'">'+st+' <span class="sq-pts" '+ptsCls+'>'+ptsStr+'</span></div>';
+    html+='<div class="sq-question">'+def.text+'</div>';
+    html+='<div class="sq-answer"><strong>Your answer:</strong> '+log.sel+'</div>';
+    if (!log.correct) {
+      html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div>';
+      html+='<div class="sq-expl">'+def.exp+'</div>';
+    }
+    html+='</div>';
+  });
+
+  document.getElementById('summary-questions').innerHTML=html;
+
+  var finalScore=Math.max(0,Math.min(20,score));
+  var pct=Math.round((finalScore/20)*100);
+  var sel=document.getElementById('score-display');
+  sel.textContent=finalScore;
+  sel.className='score-big '+(pct>=70?'pass':'fail');
+  document.getElementById('score-pct-display').textContent=pct+'%';
+
+  var ob=document.getElementById('outcome-label');
+  if (scenarioEnded){ob.textContent='Scenario ended early';ob.className='outcome-badge ended';}
+  else if (lilyDied){ob.textContent='Completed with consequence';ob.className='outcome-badge partial';}
+  else{ob.textContent='Case completed';ob.className='outcome-badge completed';}
+
+  document.getElementById('summary-date-display').textContent='Completed: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  var ids=['phase-0','phase-1','phase-2','phase-3','phase-4','phase-5'];
+  ids.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('phase-summary').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
+  window.scrollTo(0,0);
+}
+
+function updateName(val){
+  document.getElementById('summary-name-display').textContent=val.trim()||'—';
+}
+</script>
+</body>
+</html>
