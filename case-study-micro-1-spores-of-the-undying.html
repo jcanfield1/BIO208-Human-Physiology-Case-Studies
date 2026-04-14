@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spores of the Undying | Introductory Microbiology</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#378ADD;--blue-dark:#0C447C;
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --gray-bg:#f8f7f4;--gray-border:#e2e0d8;
+  --text-primary:#1a1917;--text-secondary:#5F5E5A;
+  --radius-md:8px;--radius-lg:12px;
+  --tomb-dark:#0e0c07;--tomb-gold:#c9a84c;--tomb-gold-light:#f0d080;
+  --spore-green:#2d4a1e;--spore-light:#97C459;
+  --contained:#185FA5;--established:#BA7517;--thriving:#A32D2D;
+}
+body{font-family:Georgia,serif;background:#0e0c07;color:#e8e4d8;line-height:1.7;min-height:100vh;}
+.page-header{background:linear-gradient(180deg,#1a1508 0%,#0e0c07 100%);padding:2.5rem 1.5rem 2rem;text-align:center;border-bottom:1px solid #3a2e10;}
+.page-header .course-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:rgba(201,168,76,.6);margin-bottom:10px;}
+.page-header h1{font-size:32px;font-weight:normal;font-style:italic;color:var(--tomb-gold);margin-bottom:8px;letter-spacing:.02em;}
+.page-header .tagline{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.55);}
+.wrap{max-width:780px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.progress-wrap{margin-bottom:2rem;}
+.progress-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(201,168,76,.6);margin-bottom:8px;}
+.progress-bar{display:flex;gap:5px;}
+.prog-seg{flex:1;height:5px;border-radius:3px;background:#2a2310;transition:background .4s;}
+.prog-seg.done{background:var(--spore-green);}
+.prog-seg.active{background:var(--tomb-gold);}
+
+/* ORGANISM STATUS */
+.organism-status{background:#1a1508;border:1px solid #3a2e10;border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;}
+.status-orb{width:18px;height:18px;border-radius:50%;flex-shrink:0;transition:background .5s;}
+.status-orb.contained{background:var(--contained);}
+.status-orb.established{background:var(--established);}
+.status-orb.thriving{background:var(--thriving);}
+.status-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;flex-shrink:0;}
+.status-label.contained{color:#85B7EB;}
+.status-label.established{color:#FAC775;}
+.status-label.thriving{color:#f09595;}
+.status-text{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.7);font-style:italic;line-height:1.5;}
+.status-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;margin-left:auto;flex-shrink:0;}
+.status-pts.contained{color:#85B7EB;}
+.status-pts.established{color:#FAC775;}
+.status-pts.thriving{color:#f09595;}
+
+.phase{display:none;}
+.phase.active{display:block;}
+.phase-heading{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(201,168,76,.5);border-bottom:1px solid #2a2310;padding-bottom:8px;margin-bottom:1.5rem;}
+
+/* SCENE TYPES */
+.scene-card{background:#1a1508;border-radius:0 var(--radius-lg) var(--radius-lg) 0;border:1px solid #2a2310;border-left:4px solid var(--tomb-gold);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.scene-card.threat{border-left-color:#A32D2D;}
+.scene-card.neutral{border-left-color:#444;}
+.scene-card.warning{border-left-color:var(--amber);}
+.scene-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:rgba(201,168,76,.5);margin-bottom:8px;}
+.scene-text{font-size:15px;line-height:1.8;color:#e8e4d8;}
+
+.organism-voice{background:#0a1a08;border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;border-left:4px solid var(--spore-light);}
+.ov-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--spore-light);margin-bottom:10px;opacity:.7;}
+.ov-text{font-size:16px;color:rgba(232,228,216,.92);line-height:1.85;font-style:italic;}
+
+.sandstorm{background:#1a0e00;border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;border:1px solid #5a3a10;}
+.ss-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:#FAC775;margin-bottom:12px;opacity:.8;}
+.ss-text{font-size:15px;color:rgba(240,220,160,.9);line-height:1.9;font-style:italic;}
+.ss-escalation{background:rgba(163,45,45,.15);border:1px solid rgba(163,45,45,.4);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:1rem;font-family:Arial,sans-serif;font-size:14px;color:#f09595;line-height:1.6;}
+
+/* QUESTIONS */
+.question-block{background:#1a1508;border:1px solid #2a2310;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.q-tag{display:inline-block;font-family:Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:3px 9px;margin-bottom:10px;}
+.tag-mc{background:rgba(24,95,165,.25);color:#85B7EB;}
+.tag-tf{background:rgba(29,158,117,.2);color:#5DCAA5;}
+.tag-ma{background:rgba(186,117,23,.2);color:#FAC775;}
+.q-text{font-family:Arial,sans-serif;font-size:15px;font-weight:bold;line-height:1.6;margin-bottom:1rem;color:#e8e4d8;}
+.option-btn{display:block;width:100%;text-align:left;background:#12100a;border:1px solid #2a2310;border-radius:var(--radius-md);padding:10px 14px;margin-bottom:8px;font-size:14px;font-family:Arial,sans-serif;color:#c8c4b8;cursor:pointer;line-height:1.5;transition:border-color .15s,background .15s;}
+.option-btn:hover:not([disabled]){background:#1e1a10;border-color:#3a2e10;}
+.option-btn.correct{border-color:var(--teal);background:rgba(29,158,117,.15);color:#5DCAA5;}
+.option-btn.incorrect{border-color:var(--red);background:rgba(163,45,45,.15);color:#f09595;}
+.option-btn.multi-selected{border-color:var(--amber);background:rgba(186,117,23,.15);color:#FAC775;}
+.tf-wrap{display:flex;gap:10px;flex-direction:column;}
+.tf-btn{width:100%;text-align:left;background:#12100a;border:1px solid #2a2310;border-radius:var(--radius-md);padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:#c8c4b8;cursor:pointer;transition:all .15s;line-height:1.5;}
+.tf-btn:hover:not([disabled]){background:#1e1a10;}
+.tf-btn.correct{border-color:var(--teal);background:rgba(29,158,117,.15);color:#5DCAA5;}
+.tf-btn.incorrect{border-color:var(--red);background:rgba(163,45,45,.15);color:#f09595;}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-md);font-size:14px;font-family:Arial,sans-serif;line-height:1.6;display:none;}
+.feedback.show-correct{display:block;background:rgba(29,158,117,.15);color:#5DCAA5;border:1px solid rgba(29,158,117,.3);}
+.feedback.show-incorrect{display:block;background:rgba(163,45,45,.15);color:#f09595;border:1px solid rgba(163,45,45,.3);}
+.feedback.show-partial{display:block;background:rgba(186,117,23,.15);color:#FAC775;border:1px solid rgba(186,117,23,.3);}
+.check-btn{background:#12100a;border:1px solid #3a2e10;border-radius:var(--radius-md);padding:9px 18px;font-size:13px;font-family:Arial,sans-serif;color:rgba(201,168,76,.7);cursor:pointer;margin-top:8px;transition:all .15s;}
+.check-btn:hover{background:#1e1a10;color:var(--tomb-gold);}
+
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid #2a2310;}
+.nav-btn{background:#12100a;border:1px solid #2a2310;border-radius:var(--radius-md);padding:10px 24px;font-size:14px;font-family:Arial,sans-serif;color:#c8c4b8;cursor:pointer;transition:all .15s;}
+.nav-btn:hover:not([disabled]){background:#1e1a10;}
+.nav-btn[disabled]{opacity:.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--tomb-gold);color:#0e0c07;border-color:var(--tomb-gold);font-weight:bold;}
+.nav-btn.primary:hover{background:var(--tomb-gold-light);}
+
+/* SUMMARY */
+.summary-header{background:linear-gradient(180deg,#1a1508 0%,#12100a 100%);border:1px solid #3a2e10;border-radius:var(--radius-lg);padding:1.75rem 1.5rem;text-align:center;margin-bottom:1.5rem;}
+.summary-header h2{font-size:24px;font-weight:normal;font-style:italic;color:var(--tomb-gold);margin-bottom:4px;}
+.summary-header p{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.55);}
+.score-banner{display:flex;align-items:center;justify-content:center;gap:2rem;background:#1a1508;border:1px solid #3a2e10;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.score-block{text-align:center;}
+.score-big{font-size:52px;font-family:Arial,sans-serif;font-weight:bold;line-height:1;}
+.score-big.pass{color:var(--spore-light);}
+.score-big.fail{color:#f09595;}
+.score-label{font-family:Arial,sans-serif;font-size:12px;color:rgba(232,228,216,.5);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.score-divider{width:1px;height:60px;background:#2a2310;}
+.outcome-narrative{background:#0a1a08;border:1px solid rgba(151,196,89,.2);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;}
+.outcome-label{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--spore-light);margin-bottom:10px;opacity:.7;}
+.outcome-text{font-size:15px;color:rgba(232,228,216,.88);line-height:1.85;font-style:italic;}
+.stamp-block{border:1px solid rgba(201,168,76,.3);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;text-align:center;margin-bottom:1.5rem;background:#1a1508;}
+.stamp-label{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(201,168,76,.6);margin-bottom:6px;}
+.stamp-name{font-size:22px;color:var(--tomb-gold);margin-bottom:4px;}
+.stamp-date{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.5);}
+.name-input-row{background:#1a1508;border:1px solid #3a2e10;border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;}
+.name-input-row label{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.6);display:block;margin-bottom:6px;}
+.name-input-row input{width:100%;border:1px solid #3a2e10;border-radius:var(--radius-md);padding:9px 12px;font-size:15px;font-family:Georgia,serif;color:#e8e4d8;background:#12100a;}
+.name-input-row input:focus{outline:none;border-color:var(--tomb-gold);}
+.submit-instructions{background:rgba(186,117,23,.1);border:1px solid rgba(186,117,23,.3);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-family:Arial,sans-serif;font-size:14px;color:#FAC775;line-height:1.7;}
+.summary-section{margin-bottom:1.75rem;}
+.summary-section-title{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:rgba(201,168,76,.5);border-bottom:1px solid #2a2310;padding-bottom:6px;margin-bottom:1rem;}
+.sq-block{border:1px solid #2a2310;border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:10px;background:#1a1508;}
+.sq-block.correct{border-left:4px solid var(--teal);}
+.sq-block.incorrect{border-left:4px solid var(--red);}
+.sq-block.partial{border-left:4px solid var(--amber);}
+.sq-status{font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sq-status.c{color:#5DCAA5;}
+.sq-status.i{color:#f09595;}
+.sq-status.p{color:#FAC775;}
+.sq-pts{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;float:right;}
+.sq-question{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.6);margin-bottom:8px;line-height:1.5;}
+.sq-answer{font-family:Arial,sans-serif;font-size:14px;margin-bottom:4px;color:#e8e4d8;}
+.sq-correct-ans{color:#5DCAA5;}
+.sq-expl{font-family:Arial,sans-serif;font-size:13px;color:rgba(232,228,216,.6);line-height:1.6;margin-top:8px;border-top:1px solid #2a2310;padding-top:8px;}
+.locked-notice{background:rgba(163,45,45,.15);border:1px solid rgba(163,45,45,.3);border-radius:var(--radius-md);padding:10px 14px;font-family:Arial,sans-serif;font-size:13px;color:#f09595;text-align:center;margin-bottom:1.5rem;}
+@media print{
+  .page-header,.progress-wrap,.organism-status,.nav-row,.submit-instructions,.name-input-row,.locked-notice{display:none!important;}
+  .phase{display:none!important;}
+  #phase-summary{display:block!important;}
+  body{background:white;color:black;}
+  .summary-header,.stamp-block,.outcome-narrative{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="course-label">Introductory Microbiology — Pathogenesis Module | Case Study 1 of 4</div>
+  <h1>Spores of the Undying</h1>
+  <div class="tagline">You are not the victim in this story. You are the organism.</div>
+</div>
+
+<div class="wrap">
+  <div class="progress-wrap">
+    <div class="progress-label">Your biological progress through the case</div>
+    <div class="progress-bar">
+      <div class="prog-seg active" id="ps0"></div>
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+      <div class="prog-seg" id="ps6"></div>
+    </div>
+  </div>
+
+  <div class="organism-status" id="org-status">
+    <div class="status-orb established" id="status-orb"></div>
+    <div class="status-label established" id="status-label">Dormant</div>
+    <div class="status-text" id="status-text">You have been here for three thousand years. You are patient. You are waiting.</div>
+    <div class="status-pts established" id="status-pts">0 / 30 pts</div>
+  </div>
+
+  <!-- PHASE 0 — THE SEALED WORLD -->
+  <div id="phase-0" class="phase active">
+    <div class="phase-heading">Phase 1 of 6 &nbsp;—&nbsp; The Sealed World</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">You are the organism</div>
+      <div class="ov-text">You have been here for three thousand years.<br><br>You do not experience time the way a living animal does. You do not wait impatiently. You do not hunger in any way that causes suffering. You simply persist — metabolizing slowly in the darkness, breaking down what is available, producing spores when conditions allow, maintaining the colony across centuries with the quiet indifference of something that does not know it is extraordinary.<br><br>The tomb is your world. It has everything you need. Linen wrappings on a desiccated body — cellulose and protein, years of slow nutrition. Wooden coffin panels — more cellulose, complex polysaccharides. Pigments on the walls made with organic binders. Residual moisture trapped in the sealed space when the last human closed the final door and walked away into a world that has since risen and fallen several times over.<br><br>You are a fungus. An unknown isolate. You have adapted to this specific environment over hundreds of generations. You are very good at being here.</div>
+    </div>
+
+    <div class="scene-card">
+      <div class="scene-label">Your biological reality</div>
+      <div class="scene-text">The tomb has maintained a stable temperature of approximately 20°C, relative humidity of 60–70%, and complete darkness for three millennia. The organic substrates available to you — cellulose from linen and wood, proteins from mummified tissue residue, complex lipids from resin and oil offerings — have supported slow but continuous growth. The sealed environment has eliminated competition from most bacterial species and other fungi that require different conditions.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q1. The tomb has been sealed for three thousand years at stable temperature, low water activity, and complete darkness. You have colonized the organic substrates while most bacterial species have failed to establish. A researcher examining your environment proposes four competing explanations for the absence of significant bacterial growth. Which explanation is most biologically accurate?</div>
+      <button class="option-btn" onclick="selectMC(this,'q1','A',false)">A. Bacteria require oxygen for all metabolic processes, and the sealed tomb became anoxic over time — eliminating all bacterial species that could otherwise compete with fungal colonizers for the available organic substrate</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','B',false)">B. The tomb's organic substrates are composed exclusively of cellulose and complex polysaccharides that only fungi can hydrolyze — bacteria lack the enzymatic capacity to access any of the available nutrient sources in this environment</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','C',true)">C. The combination of reduced water activity below bacterial tolerance thresholds, the absence of readily soluble nutrients that most bacteria require, and fungal production of inhibitory secondary metabolites collectively created conditions that selectively favored fungal growth over bacterial establishment</button>
+      <button class="option-btn" onclick="selectMC(this,'q1','D',false)">D. Bacteria were eliminated by the antimicrobial compounds present in the mummification resins and oils used during the burial process — these compounds persist for millennia and create a sterile zone that only fungi with their thicker cell walls can tolerate</button>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q2. You are extending hyphae through the linen wrappings that have been present in the tomb since the burial. The linen is composed primarily of cellulose — long chains of beta-1,4-linked glucose units. Which of the following most accurately describes the sequence of events by which you convert this substrate into usable carbon and energy?</div>
+      <button class="option-btn" onclick="selectMC(this,'q2','A',false)">A. You absorb intact cellulose polymer chains across your hyphal plasma membrane using specialized transmembrane transporter proteins, then cleave the glycosidic bonds intracellularly using cytoplasmic glycosidases before channeling glucose monomers into glycolysis</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','B',false)">B. You solubilize cellulose by altering the local pH through acid secretion, causing spontaneous hydrolysis of the glycosidic bonds without requiring specific enzymes — the resulting glucose is then absorbed directly across the hyphal wall by concentration gradient</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','C',true)">C. You secrete cellulase complexes — including endoglucanases, exoglucanases, and beta-glucosidases — into the immediate substrate environment, sequentially cleaving the cellulose polymer into disaccharides and finally glucose monomers that are absorbed across the hyphal plasma membrane via specific transporter proteins</button>
+      <button class="option-btn" onclick="selectMC(this,'q2','D',false)">D. You form specialized haustoria that penetrate the cellulose fibers and establish direct cytoplasmic continuity with the substrate, allowing transfer of glucose across a symplastic connection without requiring secreted enzymes or membrane transport</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q3. Your dormant spores have remained viable in this sealed environment for three thousand years. A colleague argues that this longevity must be explained by continuous low-level metabolic activity — slow but ongoing DNA repair, membrane maintenance, and protein turnover — because complete metabolic arrest would be lethal to any cell over such timescales. This argument is correct.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q3','True',false)">True — sustained viability across millennia requires ongoing metabolic activity because the accumulated molecular damage from background radiation, spontaneous hydrolysis, and oxidative chemistry would be irreparable without continuous enzymatic repair throughout dormancy</button>
+        <button class="tf-btn" onclick="selectTF(this,'q3','False',true)">False — fungal spores achieve long-term viability through near-complete metabolic arrest rather than continuous repair: the extremely low internal water content essentially halts the chemical reactions that cause molecular damage, and specialized repair enzymes activate upon rehydration to address accumulated damage before germination proceeds</button>
+      </div>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q4. Over three thousand years of growth in this sealed environment, you have been continuously producing mycotoxins. A student examining your biological history proposes that mycotoxin production in this context represents an evolutionary adaptation specifically directed at deterring large vertebrate disturbance of the tomb. Evaluate this proposal.</div>
+      <button class="option-btn" onclick="selectMC(this,'q4','A',false)">A. The proposal is correct — mycotoxin biosynthetic pathways show evidence of co-evolution with vertebrate immune systems, and the specific toxins produced by tomb-dwelling fungi are structurally optimized to bind vertebrate-specific cellular targets rather than prokaryotic ones</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','B',false)">B. The proposal is partially correct — mycotoxins evolved for microbial competition but have been secondarily co-opted as vertebrate deterrents through positive selection pressure from the many large animals that have disturbed fungal habitats across evolutionary time</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','C',true)">C. The proposal is incorrect — mycotoxin production evolved as a competitive strategy against other microorganisms sharing the same limited substrate, and vertebrate toxicity is an incidental consequence of their biochemical activity rather than an evolved function, since the timescale and frequency of vertebrate disturbance is far too rare to provide meaningful selective pressure</button>
+      <button class="option-btn" onclick="selectMC(this,'q4','D',false)">D. The proposal is incorrect — mycotoxins are not produced intentionally but are unavoidable metabolic byproducts of secondary metabolism with no adaptive function whatsoever, and their inhibitory effects on both microorganisms and vertebrates are entirely coincidental consequences of their chemical structure</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q5. You are a eukaryotic organism that has persisted in this environment for three millennia. A microbiology student examining the tomb microbiome makes the following statement: "The fungal cell wall's structural composition is the single most important factor in the organism's environmental persistence, and removing or disrupting the cell wall would eliminate the organism's ability to survive in this environment." Assess this claim.</div>
+      <button class="option-btn" onclick="selectMC(this,'q5','A',false)">A. The claim is correct — the cell wall is the sole determinant of environmental persistence, and all other cellular structures including membranes, organelles, and genetic material contribute nothing to survival in low-water-activity environments without an intact wall providing structural support</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','B',false)">B. The claim is correct in principle but overstated — the cell wall is important primarily because it contains ergosterol, which is absent in bacterial membranes and gives fungi their characteristic resistance to the desiccation conditions found in ancient sealed environments</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','C',false)">C. The claim is incorrect — the cell wall plays no significant role in environmental persistence, which is determined entirely by the organism's ability to enter reversible dormancy through sporulation, a process that is independent of cell wall composition</button>
+      <button class="option-btn" onclick="selectMC(this,'q5','D',true)">D. The claim is overstated — while the chitin-rich cell wall does contribute to environmental resistance, long-term persistence results from multiple converging factors including spore wall architecture, internal water content reduction, dormancy-associated protein stabilization, and rehydration-activated repair mechanisms, none of which alone is solely determinative</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" disabled>Back</button>
+      <button class="nav-btn primary" id="nav-p1" onclick="goPhase(1)" style="display:none;">Continue — the breach approaches &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1 — THE BREACH -->
+  <div id="phase-1" class="phase">
+    <div class="phase-heading">Phase 2 of 6 &nbsp;—&nbsp; The Breach</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">The world opens</div>
+      <div class="ov-text">Something changes.<br><br>You have no sensory apparatus in the way animals do. You do not hear the sound of stone being moved. You do not see the light that splits the darkness for the first time in three thousand years. But you feel the change the way all biological systems feel environmental change — through chemistry, through physics, through the sudden and dramatic shift in the conditions that have defined your entire existence.<br><br>The air pressure changes. The humidity drops slightly. Then rises. A current moves through the chamber where there has never been a current. The temperature fluctuates. These changes — trivial to a human standing in the doorway squinting at the painted walls — are to you what an earthquake is to a building. Everything that was stable is now dynamic. Everything that was predictable is now uncertain.<br><br>Your biology responds. It cannot do otherwise. This is what you do.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q6. The tomb has been opened and the stable environmental conditions you have depended on for three thousand years have been disrupted. You respond with mass sporulation. A researcher observing this event proposes that the sporulation trigger is the detection of a specific chemical signal released by the disturbed organic substrates. An alternative hypothesis is that sporulation is triggered by the physical disruption of stable growth conditions regardless of any specific chemical signal. Which hypothesis is better supported by fungal biology?</div>
+      <button class="option-btn" onclick="selectMC(this,'q6','A',false)">A. The chemical signal hypothesis — fungi possess highly specific chemoreceptors on hyphal surfaces that detect volatile compounds released from disturbed organic substrates and transduce these signals directly into conidiophore development pathways</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','B',false)">B. Neither hypothesis is supported — mass sporulation in this context is a purely passive mechanical response triggered when physical disturbance breaks the structural connections between mature conidiophores and the hyphal mat, releasing pre-formed spores without any biological signaling</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','C',true)">C. The physical disruption hypothesis — sporulation is regulated by environmental stress signaling pathways that respond to changes in humidity, temperature, osmotic stress, and nutrient availability rather than specific chemical cues, making it a generalized response to environmental instability rather than a targeted recognition event</button>
+      <button class="option-btn" onclick="selectMC(this,'q6','D',false)">D. Both hypotheses are equally supported — fungi use redundant signaling systems that simultaneously detect specific chemical volatiles and respond to physical disruption, with both pathways independently capable of triggering complete sporulation cascades under field conditions</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q7. Your conidia have been released into the air of the tomb and the adjacent excavation site. The lead archaeologist is standing at the tomb entrance breathing normally. You need to reach the alveolar space to have any chance of establishing infection. A colleague argues that larger spores would be more effective because they carry a greater metabolic payload upon germination. Evaluate this argument in light of respiratory deposition physics.</div>
+      <button class="option-btn" onclick="selectMC(this,'q7','A',false)">A. The argument is correct — larger spores carry more stored nutrients and germinate more rapidly once deposited in the respiratory tract, and this metabolic advantage outweighs any deposition disadvantage because the mucociliary escalator cannot physically remove spores above 15 micrometers</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','B',true)">B. The argument is incorrect — respiratory deposition is governed by particle aerodynamics, and spores above 10 micrometers are deposited in the upper airway by inertial impaction where the mucociliary escalator removes them before alveolar contact occurs; only particles of 2–5 micrometers reach the alveolar space in sufficient numbers to establish infection</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','C',false)">C. The argument is partially correct — larger spores do carry more metabolic payload, and while upper airway deposition is more likely, the inflammatory response triggered by large spores in the upper airway creates a secondary route to the alveolar space through lymphatic drainage channels</button>
+      <button class="option-btn" onclick="selectMC(this,'q7','D',false)">D. The argument is incorrect for a different reason — spore size is irrelevant to alveolar penetration because all spores regardless of size are removed by the mucociliary escalator within minutes of inhalation, meaning alveolar establishment requires active motility that conidia do not possess</button>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q8. A public health officer assessing the excavation site argues that the biological risk from this tomb is equivalent to any other outdoor environment with fungal growth of similar surface area — because spore viability decreases substantially over centuries, ancient tomb environments do not present disproportionate exposure hazards compared to freshly contaminated surfaces of the same size.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q8','True',false)">True — the public health officer is correct that spore viability decreases predictably over time following well-characterized decay curves, and three-thousand-year-old spores would retain only a negligible fraction of the infectious potential of freshly produced conidia from an equivalent colonized surface area</button>
+        <button class="tf-btn" onclick="selectTF(this,'q8','False',true)">False — the public health officer is incorrect on two grounds: fungal spores demonstrate extraordinary longevity under low-humidity sealed conditions, and the enclosed accumulation of three millennia of continuous sporulation with no dispersal creates a spore reservoir of vastly greater concentration than any equivalent open-air surface, producing a disproportionate infectious dose upon disturbance</button>
+      </div>
+      <div class="feedback" id="fb-q8"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(0)">Back</button>
+      <button class="nav-btn primary" id="nav-p2" onclick="goPhase(2)" style="display:none;">Continue — entering the host &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — ENTRY -->
+  <div id="phase-2" class="phase">
+    <div class="phase-heading">Phase 3 of 6 &nbsp;—&nbsp; Entry</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">A new world. Warm. Hostile. Alive.</div>
+      <div class="ov-text">You are inhaled.<br><br>The transition is absolute. One moment you are suspended in the cool dry air of the tomb, drifting in the disturbed currents. The next you are in something warm and wet and alive — a respiratory tract lined with mucus and cilia and immune surveillance that has been doing this specific job, detecting and destroying exactly what you are, for millions of years of host evolution.<br><br>You are 3 micrometers in diameter. You are a spore. You have no active motility. You go where the airflow takes you. The question is not whether you want to establish here. The question is whether your biology is equal to the challenge of this environment.</div>
+    </div>
+
+    <div class="scene-card warning">
+      <div class="scene-label">The host environment — what you encounter</div>
+      <div class="scene-text">The human respiratory tract presents a layered series of biological defenses. The upper airways are lined with ciliated epithelium covered in mucus — a physical and chemical barrier designed to trap and expel particles. The temperature is 37°C — significantly warmer than your tomb environment. The lower airways and alveolar space are patrolled by alveolar macrophages — professional phagocytes capable of recognizing and destroying fungal spores through pattern recognition receptors. The pH is tightly regulated. The oxygen tension is high. Everything about this environment is actively hostile to your establishment.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q9. You have reached the alveolar space and an alveolar macrophage is attempting phagocytosis. Two students debate your survival strategy. Student A argues that you survive by being too large for macrophages to engulf. Student B argues that you survive through surface properties that reduce recognition and wall properties that resist phagolysosomal killing. Which student is correct and why?</div>
+      <button class="option-btn" onclick="selectMC(this,'q9','A',false)">A. Student A is correct — alveolar macrophages have a fixed maximum phagocytic capacity of approximately 3 micrometers, and conidia that exceed this threshold are physically incapable of being engulfed regardless of surface properties or wall composition</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','B',true)">B. Student B is correct — macrophages readily phagocytose particles up to 10–20 micrometers; survival depends on hydrophobic surface proteins and melanin that mask pattern recognition ligands reducing engulfment probability, combined with cell wall resistance to phagolysosomal degradative enzymes if engulfment occurs</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','C',false)">C. Student A is correct for a different reason — conidia are not too large to engulf but their hydrophobic surface causes them to aggregate into clusters that exceed macrophage capacity, and it is this aggregation rather than individual spore size that prevents phagocytosis</button>
+      <button class="option-btn" onclick="selectMC(this,'q9','D',false)">D. Both students are partially correct — size prevents engulfment of intact conidia while surface properties only matter after germination begins, because ungerminated spores lack the surface-exposed PAMPs that macrophage pattern recognition receptors detect regardless of size</button>
+      <div class="feedback" id="fb-q9"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q10. A researcher proposes that thermotolerance at 37°C is not a true virulence factor because it is simply a general property of eukaryotic cells — all eukaryotes maintain cellular function at mammalian body temperature, so the ability to grow at 37°C cannot be considered a specific adaptation that distinguishes pathogenic from non-pathogenic fungi.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q10','True',false)">True — the researcher is correct that eukaryotic cellular machinery is inherently functional across the temperature range that includes mammalian body temperature, making thermotolerance a basal eukaryotic property rather than a derived adaptation specific to fungal pathogens</button>
+        <button class="tf-btn" onclick="selectTF(this,'q10','False',true)">False — the researcher's claim is incorrect; the vast majority of environmental fungi have optimal growth temperatures of 25–30°C and cannot grow at 37°C, meaning thermotolerance requires specific molecular adaptations including heat shock protein upregulation, membrane lipid adjustment, and enzyme stability modifications that are absent in most saprophytic species and represent a genuine virulence-associated adaptation</button>
+      </div>
+      <div class="feedback" id="fb-q10"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q11. You have survived initial macrophage contact and have begun germinating in the alveolar space. From a pathogenesis perspective, which of the following most accurately characterizes why your transition from spore to hyphal form represents a qualitative shift in the nature of the host-pathogen interaction rather than simply an increase in organism size?</div>
+      <button class="option-btn" onclick="selectMC(this,'q11','A',false)">A. The transition is qualitative because hyphal forms switch from aerobic to anaerobic metabolism, making them resistant to the oxidative burst that is the macrophage's primary fungicidal mechanism — a resistance that spores, which rely on aerobic respiration, do not possess</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','B',false)">B. The transition is qualitative because hyphal surface antigens are completely different from spore surface antigens, meaning the adaptive immune system must restart its recognition and response process from zero after the morphological shift occurs</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','C',false)">C. The transition is qualitative because germination triggers the secretion of a polysaccharide capsule analogous to that of Cryptococcus neoformans, providing physical protection from complement deposition that spores lack</button>
+      <button class="option-btn" onclick="selectMC(this,'q11','D',true)">D. The transition is qualitative because hyphae exceed the phagocytic capacity of macrophages and neutrophils while simultaneously secreting tissue-degrading enzymes that create a biochemical niche — changing the interaction from a containable particle-clearance event to an active tissue invasion that requires a fundamentally different and more elaborate immune response to control</button>
+      <div class="feedback" id="fb-q11"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(1)">Back</button>
+      <button class="nav-btn primary" id="nav-p3" onclick="goPhase(3)" style="display:none;">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SANDSTORM — PURE NARRATIVE -->
+  <div id="phase-sandstorm" class="phase">
+    <div class="phase-heading">The Escalation &nbsp;—&nbsp; an event outside anyone's control</div>
+
+    <div class="sandstorm">
+      <div class="ss-label">The sandstorm</div>
+      <div class="ss-text">You have been patient for three thousand years.<br><br>You can afford to be patient for thirty more minutes.<br><br>And then the wind comes.<br><br>It begins as a change in light — the sky above the excavation site turns the color of old copper, then amber, then a brown so deep it looks almost solid. Someone in the camp shouts. Equipment is grabbed. Tent flaps are tied down. The archaeologists who were working outside begin moving toward shelter with the particular urgency of people who have seen this before.<br><br>The field laboratory is a canvas tent with aluminum poles and mesh ventilation panels designed for airflow in the heat. It is not designed for a sandstorm. When the wind arrives in force — 80 kilometers per hour, carrying 3,000 years of desert particulate — the mesh panels become irrelevant. The canvas walls billow inward. The aluminum frame shudders. And the boundary between inside and outside, between controlled and uncontrolled, between contained and dispersed, dissolves in approximately four minutes.<br><br>On the laboratory bench inside that tent: sample vials from the tomb. Swabs in transport media. Open petri dishes that someone had not yet sealed because they were mid-process when the alarm was raised. Culture preparations. Slide preparations. Spore suspensions in buffer that a graduate student had been preparing for microscopy.<br><br>The wind that moves through that tent does not distinguish between sample and air. It carries everything it touches.<br><br>You are in that wind now. All of you. Spores from the tomb. Spores from the cultures. Spores from the surfaces of every imperfectly sealed container. You are distributed across the camp in a dispersal event that would have taken person-to-person transmission weeks to accomplish.<br><br>The twenty-three people at this excavation site have all just been exposed. Not all of them will develop infection — most healthy immune systems will clear the exposure. But the biology does not know that yet. The biology only knows that you are everywhere now.</div>
+      <div class="ss-escalation">&#9650; Organism status reset to Established regardless of prior performance. The sandstorm is not a consequence of any decision. It is biology encountering weather. Every student continues from this point with the organism in an Established state across the full camp population.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(2)">Back</button>
+      <button class="nav-btn primary" onclick="goPhase(4)">Continue — the immune war &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3 — IMMUNE WAR -->
+  <div id="phase-3" class="phase">
+    <div class="phase-heading">Phase 4 of 6 &nbsp;—&nbsp; The Immune War</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">They know you are here</div>
+      <div class="ov-text">The initial encounter is over. You are established in lung tissue — at least some of you are. The sandstorm has scattered the rest of you across the camp. In the original host, the immune response is now fully mobilized. In the new hosts exposed during the storm, innate surveillance is just beginning to respond to your presence.<br><br>This is the phase that determines everything. The immune system has millions of years of evolutionary experience dealing with exactly what you are. You have millions of years of evolutionary experience evading exactly what it does. The outcome is not predetermined.</div>
+    </div>
+
+    <div class="scene-card warning">
+      <div class="scene-label">A complication in the original host</div>
+      <div class="scene-text">During the post-storm medical assessment of the camp, it is discovered that the lead archaeologist — the first person to enter the tomb and the individual with the highest initial spore exposure — has been taking oral corticosteroids for an autoimmune condition. This information was not disclosed during the pre-expedition health screening. The implications for your establishment in this particular host are significant.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q12. The lead archaeologist is taking corticosteroids for an unrelated autoimmune condition. Two explanations are proposed for why this dramatically increases your ability to establish invasive disease in this host. Explanation 1: corticosteroids directly stimulate fungal growth by acting as molecular signals that upregulate your hyphal extension pathways. Explanation 2: corticosteroids impair the host cellular immune mechanisms that would otherwise contain your germination and hyphal growth. Which explanation is biologically accurate?</div>
+      <button class="option-btn" onclick="selectMC(this,'q12','A',false)">A. Explanation 1 is correct — corticosteroids are steroid molecules that can cross fungal cell membranes and bind to ergosterol-associated receptors, directly upregulating transcription of hyphal growth genes in a mechanism analogous to how they regulate gene expression in mammalian cells</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','B',true)">B. Explanation 2 is correct — corticosteroids suppress macrophage phagocytic activity, impair neutrophil recruitment and oxidative burst function, and reduce T cell-mediated adaptive responses, removing the primary cellular defenses that would otherwise limit germination and contain hyphal invasion in the pulmonary tissue</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','C',false)">C. Both explanations are correct — corticosteroids simultaneously stimulate fungal growth through steroid receptor binding and suppress host immunity through anti-inflammatory mechanisms, creating a dual advantage that explains why corticosteroid-treated patients are disproportionately susceptible to invasive fungal disease</button>
+      <button class="option-btn" onclick="selectMC(this,'q12','D',false)">D. Neither explanation is correct — the increased susceptibility of corticosteroid-treated hosts to fungal infection is explained entirely by corticosteroid-induced changes in respiratory tract mucus composition that reduce the physical barrier function of the mucociliary escalator rather than by any effect on cellular immunity</button>
+      <div class="feedback" id="fb-q12"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q13. The host immune system has formed a granuloma around a cluster of your hyphae in the lung tissue. A student states: "Granuloma formation represents a complete immune victory — the organism is permanently walled off and eliminated, and the host is protected from both current and future reactivation." Assess this statement in light of what you know about granuloma biology and fungal persistence.</div>
+      <button class="option-btn" onclick="selectMC(this,'q13','A',false)">A. The statement is correct — the granuloma's activated macrophages continuously produce reactive oxygen species and proteolytic enzymes that sterilize the enclosed space within days of formation, and the fibrotic capsule that develops permanently prevents any surviving fungal cells from accessing host nutrients required for reactivation</button>
+      <button class="option-btn" onclick="selectMC(this,'q13','B',false)">B. The statement is correct regarding current infection but incorrect regarding reactivation — while the granuloma eliminates the active infection, the cellular debris remaining after fungal killing creates a sterile inflammatory niche that can mistakenly trigger a secondary immune response years later without any viable fungal cells present</button>
+      <button class="option-btn" onclick="selectMC(this,'q13','C',true)">C. The statement is incorrect — while the granuloma does provide containment by isolating the hyphal focus, the hypoxic and nutrient-poor interior can support metabolically reduced but viable fungal cells for years, and reactivation producing active invasive disease is a genuine risk if the host's immunity is subsequently compromised by illness, immunosuppressive therapy, or aging</button>
+      <button class="option-btn" onclick="selectMC(this,'q13','D',false)">D. The statement is incorrect for a different reason — granuloma formation actually indicates immune failure rather than success, because a competent immune system eliminates fungal pathogens through direct macrophage killing before granuloma formation is necessary, and the presence of a granuloma is therefore a marker of inadequate primary immune response</button>
+      <div class="feedback" id="fb-q13"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q14. Your hyphae are producing mycotoxins within infected lung tissue. A researcher argues that mycotoxin production in the host environment is evolutionarily maladaptive — causing collateral damage that triggers a stronger immune response and ultimately harms the organism by accelerating immune clearance. An alternative view holds that mycotoxin production is net beneficial even in the host context. Which position is better supported?</div>
+      <button class="option-btn" onclick="selectMC(this,'q14','A',false)">A. The researcher's argument is correct — mycotoxin production in the host context is a maladaptive trait retained from the saprophytic lifestyle that actively shortens the organism's survival window by triggering more aggressive neutrophil and macrophage recruitment than would occur in the absence of toxin production</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','B',false)">B. The alternative view is correct but for an unexpected reason — mycotoxins in the host are beneficial primarily because they suppress the adaptive immune response by inhibiting lymphocyte proliferation, and this effect on the acquired immune system rather than on innate immunity or tissue access is the primary benefit of toxin production during infection</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','C',true)">C. The alternative view is better supported — mycotoxins including gliotoxin inhibit macrophage and neutrophil function, cause local epithelial necrosis that creates nutrient-rich space for hyphal expansion, and disrupt tight junctions that would otherwise limit tissue invasion, providing net advantages that outweigh the cost of any heightened immune activation they trigger</button>
+      <button class="option-btn" onclick="selectMC(this,'q14','D',false)">D. The researcher's argument is correct on net balance — while mycotoxins do provide some localized tissue access advantage, the massive inflammatory amplification they cause in a mammalian host far exceeds the response triggered by hyphae alone, and mycotoxin-producing strains consistently show shorter survival in immunocompetent host models than non-producing isogenic mutants</button>
+      <div class="feedback" id="fb-q14"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q15. A colleague argues that because the sandstorm exposed all twenty-three camp members to your spores simultaneously, the expected outcome is that all or nearly all will develop pulmonary disease — because a shared high-dose exposure event produces equivalent outcomes across all exposed individuals regardless of individual immune variation.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q15','True',false)">True — high-dose point-source exposures override individual immune variation because the infectious dose exceeds the clearance capacity of even competent innate immune systems, making population-wide disease the expected outcome when a virulent pathogen is delivered simultaneously to a large cohort at equivalent dose</button>
+        <button class="tf-btn" onclick="selectTF(this,'q15','False',true)">False — even at high exposure doses, the outcome of fungal spore inhalation is primarily determined by host immune competence rather than dose alone; immunocompetent individuals with functional alveolar macrophages and neutrophil responses will clear the majority of spores before germination, and invasive disease is expected only in immunocompromised individuals despite identical exposure across the cohort</button>
+      </div>
+      <div class="feedback" id="fb-q15"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(3)">Back</button>
+      <button class="nav-btn primary" id="nav-p5" onclick="goPhase(5)" style="display:none;">Continue — spread or containment &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4 — SPREAD OR CONTAINMENT -->
+  <div id="phase-4" class="phase">
+    <div class="phase-heading">Phase 5 of 6 &nbsp;—&nbsp; Spread or Containment</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">What you have become</div>
+      <div class="ov-text">The sandstorm scattered you. The immune systems of twenty-two of the twenty-three exposed hosts are now making decisions about you — decisions that will be made at the cellular level, silently, without any awareness on your part. In the immunocompromised host you are growing. In the others, your fate is being determined by the strength of innate defenses you have been fighting since you first entered the respiratory tract.<br><br>The question now is not whether you will be eliminated in some hosts. You will be. The question is whether your biology — your spore structure, your thermotolerance, your immune evasion toolkit — is sufficient to establish disease in enough hosts to matter.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q16. An epidemiologist reviewing the outbreak notes that all cases at the excavation site share a common exposure window defined by the tomb opening and the sandstorm, and that no new cases have emerged among family members of the affected archaeologists despite close contact at home. A student interprets this as evidence that the organism has low virulence. An alternative interpretation is that the absence of secondary cases reflects the transmission biology of the pathogen rather than its virulence. Which interpretation is better supported?</div>
+      <button class="option-btn" onclick="selectMC(this,'q16','A',false)">A. The student's interpretation is better supported — low secondary attack rate in household contacts is the standard epidemiological measure of low virulence, and the absence of family member cases confirms that the organism's capacity to cause disease is insufficient to overcome the immune defenses of people not exposed at the original point-source event</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','B',true)">B. The alternative interpretation is better supported — this fungal pathogen requires inhalation of environmental conidia to establish infection and is not transmitted person-to-person; the absence of secondary cases reflects that human-to-human respiratory transmission is not a feature of this organism's biology, which is a transmission characteristic rather than a measure of virulence</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','C',false)">C. Neither interpretation is well supported — the absence of secondary cases is most parsimoniously explained by the household contacts having pre-existing immunity from prior environmental fungal exposures, which is common in adults and would prevent disease even if person-to-person transmission were theoretically possible</button>
+      <button class="option-btn" onclick="selectMC(this,'q16','D',false)">D. Both interpretations are partially correct — the absence of secondary cases reflects both low virulence and limited transmission capacity, and epidemiological data cannot distinguish between these two explanations without additional experimental evidence of the organism's transmissibility under controlled conditions</button>
+      <div class="feedback" id="fb-q16"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q17. In the lead archaeologist, you have achieved dissemination beyond the lung into the bloodstream. A researcher proposes three possible mechanisms: (1) mechanical hyphal puncture of vessel walls through turgor pressure, (2) protease-mediated degradation of the extracellular matrix and barrier structures, (3) transcytosis through endothelial cells triggered by fungal surface ligands. Which assessment of these mechanisms is most accurate?</div>
+      <button class="option-btn" onclick="selectMC(this,'q17','A',false)">A. Mechanism 1 is the primary route — hyphal tip turgor pressure in filamentous fungi reaches values sufficient to physically rupture capillary walls, and this mechanical breach is the established primary mechanism of vascular dissemination for all invasive molds including this genus</button>
+      <button class="option-btn" onclick="selectMC(this,'q17','B',false)">B. Mechanism 3 is the primary route — all invasive fungal pathogens use receptor-mediated transcytosis as their exclusive mechanism of vascular entry, and protease secretion plays no role in barrier disruption because the basement membrane is not a significant obstacle to fungal dissemination</button>
+      <button class="option-btn" onclick="selectMC(this,'q17','C',false)">C. Mechanisms 1 and 3 operate together while Mechanism 2 is incorrect — secreted proteases are too large to diffuse through tissue to reach the basement membrane and therefore cannot contribute to barrier degradation during hyphal invasion of vascular structures</button>
+      <button class="option-btn" onclick="selectMC(this,'q17','D',true)">D. Mechanism 2 is well established and Mechanism 3 has experimental support, while Mechanism 1 overstates the contribution of turgor pressure — the primary barrier-crossing mechanism involves protease-mediated ECM degradation with possible contributions from transcytosis, not mechanical puncture which lacks sufficient force to rupture intact vessel walls</button>
+      <div class="feedback" id="fb-q17"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q18. A pharmacologist studying corticosteroid-treated patients argues that infectious dose for fungal pathogens should be defined as a fixed number of organisms based on the pathogen's intrinsic virulence characteristics, and that adjusting the infectious dose threshold based on host immune status introduces an unscientific variable that makes infectious dose an undefined and therefore useless concept in microbiology.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q18','True',false)">True — the pharmacologist is correct that a scientifically rigorous definition of infectious dose must be based on pathogen properties alone; host immune variation is an experimental confound that should be controlled for by defining infectious dose exclusively in standardized immunocompetent animal models rather than incorporating it as a variable in the definition</button>
+        <button class="tf-btn" onclick="selectTF(this,'q18','False',true)">False — the pharmacologist's argument reflects a misunderstanding of infectious dose as a concept; infectious dose is inherently an interaction property between pathogen and host, and the observation that the same inoculum produces disease in immunocompromised but not immunocompetent hosts does not make the concept undefined — it correctly reflects that host defense capacity is a determinant of infection outcome alongside pathogen inoculum size</button>
+      </div>
+      <div class="feedback" id="fb-q18"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(4)">Back</button>
+      <button class="nav-btn primary" id="nav-p6" onclick="goPhase(6)" style="display:none;">Continue — identification &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PHASE 5 — IDENTIFICATION -->
+  <div id="phase-5" class="phase">
+    <div class="phase-heading">Phase 6 of 6 &nbsp;—&nbsp; Identification</div>
+
+    <div class="organism-voice">
+      <div class="ov-label">They are looking at you now</div>
+      <div class="ov-text">A researcher is preparing a culture from a bronchoalveolar lavage sample taken from the lead archaeologist. She has plated the sample on Sabouraud dextrose agar and incubated at 37°C. She is looking at you — or rather, at your colony — under a dissecting microscope. She has a compound microscope beside her and a reference text open on the bench.<br><br>You do not experience being identified. You do not know that what she sees determines what happens next. You are simply growing, doing what you do, expressing the biological characteristics that are intrinsic to what you are. But those characteristics — the color of your colony surface, the texture, the rate of growth, the microscopic structure of your conidiophores and conidia — are about to tell her everything she needs to know.</div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q19. The researcher has plated your bronchoalveolar lavage sample on Sabouraud dextrose agar and incubated at 37°C. After 5 days she observes a colony and must decide which macroscopic feature to prioritize for initial genus-level identification. She considers four options: growth rate, colony weight, surface pigmentation and texture, or medium pH change. A colleague argues that any of these four are equally informative at the genus level. Assess this claim.</div>
+      <button class="option-btn" onclick="selectMC(this,'q19','A',false)">A. The colleague is correct — all four macroscopic features provide equivalent genus-level discriminatory power, and the choice between them is a matter of laboratory preference rather than biological informativeness, since each feature independently and reliably distinguishes between the major pathogenic fungal genera</button>
+      <button class="option-btn" onclick="selectMC(this,'q19','B',false)">B. The colleague is incorrect — colony weight is the single most informative macroscopic feature because biomass production is tightly regulated by genus-specific metabolic pathways, and dry weight measurements after standardized incubation periods provide reliable genus-level identification that is reproducible across laboratories</button>
+      <button class="option-btn" onclick="selectMC(this,'q19','C',true)">C. The colleague is incorrect — colony surface pigmentation, texture, and morphology are substantially more genus-informative than growth rate, weight, or pH, because these visible features directly reflect the underlying conidial pigmentation chemistry, hyphal architecture, and sporulation pattern that are diagnostically characteristic of different fungal genera</button>
+      <button class="option-btn" onclick="selectMC(this,'q19','D',false)">D. The colleague is incorrect — medium pH change is the most informative feature because the characteristic acidification or alkalinization patterns produced by genus-specific metabolic activities are more biochemically reproducible than morphological features, which are subject to significant variation based on media composition, incubation temperature, and colony age</button>
+      <div class="feedback" id="fb-q19"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-mc">Multiple Choice</div>
+      <div class="q-text">Q20. The researcher has prepared a lactophenol cotton blue mount from your colony and observes septate hyphae bearing conidiophores that terminate in a swollen vesicle from which phialides radiate, producing chains of conidia. She must now select among four genera as her working identification. Which genus does this architecture most specifically describe, and what feature of the other three genera rules them out?</div>
+      <button class="option-btn" onclick="selectMC(this,'q20','A',false)">A. Candida — characterized by the same vesicle-bearing conidiophore architecture but distinguished from the correct answer by producing budding yeast cells in addition to hyphae, whereas the correct answer produces only true hyphae without any yeast phase during growth on standard laboratory media</button>
+      <button class="option-btn" onclick="selectMC(this,'q20','B',false)">B. Mucor — similar to the correct answer in producing septate hyphae with specialized reproductive structures, but distinguished by the fact that Mucor produces its spores within enclosed sporangia rather than in open chains from phialides, and its hyphae are characteristically broader in diameter</button>
+      <button class="option-btn" onclick="selectMC(this,'q20','C',true)">C. Aspergillus — uniquely defined by the conidiophore-vesicle-phialide-conidia chain architecture described; Candida lacks true hyphae and conidiophores, Mucor produces aseptate hyphae and sporangia rather than phialide-borne conidia chains, and Cryptococcus is an encapsulated yeast with no hyphal or conidiophore growth on standard media</button>
+      <button class="option-btn" onclick="selectMC(this,'q20','D',false)">D. Cryptococcus — similar to the correct answer in producing chains of cells from specialized structures, but distinguished by the presence of a thick polysaccharide capsule visible on India ink preparation and the absence of the septate hyphal network that characterizes the correct answer on standard agar</button>
+      <div class="feedback" id="fb-q20"></div>
+    </div>
+
+    <div class="question-block">
+      <div class="q-tag tag-tf">True / False</div>
+      <div class="q-text">Q21. A graduate student argues that Koch's Postulates should be applied to this fungal isolate in their original unmodified form to definitively establish causation — and that any proposed modifications to the postulates for fungi represent scientifically unsound departures from the rigorous standard Koch established, since the postulates have successfully established causation for every previously studied bacterial pathogen.</div>
+      <div class="tf-wrap">
+        <button class="tf-btn" onclick="selectTF(this,'q21','True',false)">True — the graduate student is correct that Koch's original formulation has universal applicability; the apparent limitations for fungi are methodological rather than conceptual, and improved experimental techniques for reproducing disease in standardized animal models have eliminated the need for any modification of the postulates for eukaryotic pathogens</button>
+        <button class="tf-btn" onclick="selectTF(this,'q21','False',true)">False — the graduate student's argument fails on two grounds: Koch's third postulate requires that the isolated organism cause disease in every healthy host into which it is introduced, but this fungal isolate causes disease only in immunocompromised hosts — violating the postulate through biology rather than methodology — and the ethical impossibility of experimental human inoculation means modified postulates incorporating molecular, genomic, and immunological evidence are scientifically necessary rather than a departure from rigor</button>
+      </div>
+      <div class="feedback" id="fb-q21"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="goPhase(5)">Back</button>
+      <button class="nav-btn primary" id="nav-summary" onclick="buildSummary()" style="display:none;">View my submission summary &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY PAGE -->
+  <div id="phase-summary" class="phase">
+    <div class="locked-notice">This case study is now complete and locked. Your answers and score cannot be changed.</div>
+    <div class="summary-header">
+      <h2>Spores of the Undying — Submission Summary</h2>
+      <p>Introductory Microbiology &nbsp;|&nbsp; Pathogenesis Module &nbsp;|&nbsp; Case Study 1 of 4</p>
+    </div>
+    <div class="name-input-row">
+      <label>Enter your full name for the submission stamp:</label>
+      <input type="text" id="student-name-input" placeholder="First Last" oninput="updateName(this.value)">
+    </div>
+    <div class="stamp-block">
+      <div class="stamp-label">Completed by</div>
+      <div class="stamp-name" id="summary-name-display">—</div>
+      <div class="stamp-date" id="summary-date-display"></div>
+    </div>
+    <div class="score-banner">
+      <div class="score-block">
+        <div class="score-big" id="score-display">—</div>
+        <div class="score-label">Points earned</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div style="font-size:28px;font-family:Arial,sans-serif;font-weight:bold;" id="score-pct-display">—</div>
+        <div class="score-label">Out of 30</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div class="status-orb" id="final-orb" style="width:24px;height:24px;margin:0 auto 6px;"></div>
+        <div class="score-label" id="final-status-label">Final status</div>
+      </div>
+    </div>
+    <div class="outcome-narrative">
+      <div class="outcome-label">What the organism ultimately did</div>
+      <div class="outcome-text" id="outcome-text">—</div>
+    </div>
+    <div class="submit-instructions">
+      <strong>How to submit:</strong> Enter your name above, then take a screenshot of this entire page or use Ctrl+P (Windows) / Cmd+P (Mac) to save as PDF. Upload that file to the Canvas assignment.
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">All questions — your answers and explanations</div>
+      <div id="summary-questions"></div>
+    </div>
+    <div class="nav-row">
+      <span style="font-family:Arial,sans-serif;font-size:13px;color:rgba(201,168,76,.4);">Case study complete and locked</span>
+      <button class="nav-btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var score=0;
+var orgScore=0;
+var mcLocked={};
+var tfLocked={};
+var maLocked={};
+var alog={};
+var currentPhase=0;
+
+var phaseQ={0:['q1','q2','q3','q4','q5'],1:['q6','q7','q8'],2:['q9','q10','q11'],3:['q12','q13','q14','q15'],4:['q16','q17','q18'],5:['q19','q20','q21']};
+
+var qdefs={
+  q1:{text:'Q1. Which explanation most accurately accounts for the absence of significant bacterial growth in the sealed tomb environment?',pts:1,
+    cl:'C — Reduced water activity below bacterial tolerance thresholds, absence of readily soluble nutrients, and fungal production of inhibitory secondary metabolites',
+    exp:'This question requires distinguishing between plausible-sounding but incorrect explanations. Option A is wrong because many bacteria are facultative or obligate anaerobes and would thrive in an anoxic environment. Option B is wrong because many bacteria do produce cellulases and can access cellulose. Option D is wrong because mummification compounds, while antimicrobial, do not persist indefinitely and would not selectively spare fungi. The correct answer recognizes that the combination of low water activity, nutrient unavailability in forms accessible to most bacteria, and chemical competition from fungal secondary metabolites collectively creates selective conditions that favor fungi over bacteria in this specific environment.'},
+  q2:{text:'Q2. Which sequence of events most accurately describes how you convert cellulose into usable carbon and energy?',pts:1,
+    cl:'C — Secreting cellulase complexes extracellularly to sequentially cleave cellulose into glucose monomers absorbed via specific membrane transporters',
+    exp:'This question tests understanding of saprotrophic extracellular digestion. Option A is wrong because intact polymer chains cannot cross plasma membranes — only small molecules are transported. Option B is wrong because spontaneous acid hydrolysis of cellulose requires extreme conditions not present in fungal microenvironments, and pH alone is insufficient. Option D is wrong because haustoria are structures used by biotrophic parasites to penetrate living host cells — they are not used for saprotrophic substrate digestion. The correct answer accurately describes the three-enzyme cellulase system that sequentially degrades crystalline cellulose to glucose.'},
+  q3:{text:'Q3. A colleague argues that three-thousand-year spore viability requires continuous metabolic activity throughout dormancy. This argument is correct. (T/F)',pts:1,
+    cl:'False — near-complete metabolic arrest combined with rehydration-activated repair enzymes explains long-term viability more accurately than continuous activity',
+    exp:'This question inverts the expected intuition. The argument sounds plausible because we associate cellular maintenance with ongoing activity. But fungal spore longevity actually depends on the opposite — minimizing metabolic activity to minimize the production of damaging reactive oxygen species, spontaneous chemical reactions, and the energy expenditure that would deplete limited reserves. The extremely low internal water content of dormant spores essentially freezes chemical reaction rates. When the spore is rehydrated, specific repair enzymes — including those for oxidative DNA damage — activate to address accumulated damage before germination begins.'},
+  q4:{text:'Q4. A student proposes that mycotoxin production in the tomb represents an evolutionary adaptation specifically to deter vertebrate disturbance. Evaluate this proposal.',pts:2,
+    cl:'C — Incorrect — mycotoxins evolved for microbial competition; vertebrate toxicity is incidental, and vertebrate disturbance is too rare and recent to provide meaningful selective pressure',
+    exp:'This question requires applying evolutionary reasoning to a common misconception. Option A is wrong because there is no evidence that mycotoxin biosynthetic pathways show vertebrate-specific co-evolution — the molecular targets of many mycotoxins (ribosomes, membranes, electron transport) are shared across kingdoms. Option B is a more sophisticated wrong answer — it acknowledges microbial origins but incorrectly proposes secondary co-option for vertebrate deterrence, which would require a frequency and consistency of vertebrate disturbance that tomb environments simply do not provide. Option D is wrong because it dismisses all adaptive function — mycotoxins are clearly adaptive for microbial competition even if not for vertebrate deterrence. The correct answer identifies the actual selective context while accurately characterizing vertebrate toxicity as incidental.'},
+  q5:{text:'Q5. A student claims the cell wall is the single most important factor in environmental persistence. Assess this claim.',pts:2,
+    cl:'D — Overstated — long-term persistence results from multiple converging factors including spore wall architecture, water content reduction, protein stabilization, and rehydration-activated repair mechanisms',
+    exp:'This question tests the ability to evaluate a partially correct claim. Option A is wrong because it accepts the claim uncritically while adding an incorrect additional claim — ergosterol is a membrane component, not a cell wall component, and does not confer desiccation resistance. Option B commits the same error with ergosterol. Option C goes too far in the other direction — dismissing cell wall contributions entirely. The correct answer acknowledges the cell wall\'s genuine contribution while correctly identifying that persistence is a multi-factor phenomenon. No single cellular component can be identified as "solely determinative" — this is a sophisticated biological reasoning question requiring students to evaluate claims rather than simply recall facts.'},
+  q6:{text:'Q6. Which hypothesis better explains the sporulation trigger — specific chemical signal detection, or generalized environmental stress response?',pts:1,
+    cl:'C — Sporulation is regulated by environmental stress signaling pathways responding to changes in humidity, temperature, osmotic stress, and nutrient availability — a generalized response to instability',
+    exp:'Option A incorrectly posits highly specific chemoreceptors for substrate volatiles — while fungi do detect some chemical gradients, mass sporulation is not triggered by specific molecular recognition of disturbed substrates. Option B incorrectly describes sporulation as purely passive mechanical release of pre-formed spores. Option D incorrectly claims redundant parallel signaling systems both operating simultaneously. Sporulation in response to environmental disruption is a conserved stress response pathway triggered by multiple destabilizing inputs through established MAP kinase and other signal transduction cascades — not a targeted recognition event.'},
+  q7:{text:'Q7. Is the argument that larger spores are more effective correct when evaluated against respiratory deposition physics?',pts:2,
+    cl:'B — Incorrect — particles above 10 micrometers are removed by inertial impaction in the upper airway; only 2–5 micrometer particles reach the alveolar space in sufficient numbers',
+    exp:'Option A incorrectly accepts the metabolic payload argument while misstating mucociliary capacity — the escalator removes particles well above 3 micrometers. Option C introduces a fictional lymphatic drainage secondary route that does not exist as a meaningful pathway for fungal spore access to the alveolar space. Option D is wrong in claiming all spores are removed regardless of size — 2–5 micrometer particles do reach the alveolar space in significant numbers. Respiratory deposition is determined by inertial impaction (large particles), sedimentation (medium particles), and diffusion (very small particles), with the alveolar-penetrating range being 2–5 micrometers.'},
+  q8:{text:'Q8. Is the public health officer correct that ancient tombs present equivalent biological risk to fresh fungal contamination of equivalent surface area?',pts:1,
+    cl:'False — the officer is incorrect on two grounds: fungal spores survive under low-humidity sealed conditions, and three millennia of accumulation creates disproportionately concentrated infectious dose',
+    exp:'Option A (True) accepts the officer\'s position based on a predicted spore viability decay that does not accurately reflect actual fungal spore longevity under ideal preservation conditions. Archaeomycological studies have confirmed viable fungal spores from ancient sealed environments. The sealed tomb creates a unique exposure scenario: no dispersal has occurred for three thousand years, meaning the spore concentration immediately inside the tomb entrance far exceeds anything encountered in an open-air colonized surface of equivalent size. This is the biological basis for the disproportionate hazard of archaeological fungal exposures.'},
+  q9:{text:'Q9. Which student is correct about your survival strategy against alveolar macrophage phagocytosis?',pts:2,
+    cl:'B — Student B is correct — survival depends on surface protein and melanin-mediated recognition reduction, plus cell wall resistance to phagolysosomal enzymes',
+    exp:'Student A is wrong because macrophages routinely phagocytose particles up to 10–20 micrometers — fungal spores at 2–5 micrometers are well within phagocytic capacity. Option C introduces a fictional aggregation mechanism. Option D incorrectly states that ungerminated spores lack surface PAMPs — beta-glucan and other PAMPs are present on spore surfaces, which is precisely why masking them with hydrophobic rodlet proteins is important. The correct mechanism involves two complementary strategies: reducing the probability of recognition through surface masking, and resisting killing through wall composition if engulfment occurs.'},
+  q10:{text:'Q10. Is the researcher correct that thermotolerance is not a true virulence factor because it is a general eukaryotic property?',pts:1,
+    cl:'False — the researcher is incorrect; most environmental fungi cannot grow at 37°C and thermotolerance requires specific molecular adaptations absent in most saprophytic species',
+    exp:'Option A (True) accepts the incorrect claim by conflating eukaryotic cellular function at warm temperatures with growth at mammalian core temperature. Most fungal species have optimal growth temperatures of 25–30°C and are killed or growth-inhibited at 37°C. Thermotolerance at 37°C requires upregulation of heat shock proteins, adjustment of membrane lipid composition to maintain fluidity, and thermal stability of key metabolic enzymes — these are not universal eukaryotic properties but derived adaptations found in a specific subset of fungi. The correlation between thermotolerance and human pathogenicity is one of the strongest predictive relationships in medical mycology.'},
+  q11:{text:'Q11. Which answer most accurately characterizes why the spore-to-hypha transition represents a qualitative rather than merely quantitative shift?',pts:2,
+    cl:'D — Hyphae exceed phagocytic capacity while secreting tissue-degrading enzymes, changing the interaction from containable particle clearance to active tissue invasion requiring fundamentally different immune response',
+    exp:'Option A incorrectly claims hyphae switch to anaerobic metabolism — hyphae are aerobic. Option B overstates antigen differences — while some surface changes occur, the adaptive immune system does not need to restart entirely. Option C incorrectly attributes capsule formation to this organism — capsule production is characteristic of Cryptococcus, not filamentous molds. The correct answer captures the key qualitative shift: the immune system\'s particle-clearance mechanisms (phagocytosis) become structurally insufficient while simultaneously the organism transitions from passive presence to active tissue degradation, fundamentally changing the nature of the conflict.'},
+  q12:{text:'Q12. Which explanation correctly accounts for why corticosteroid use increases susceptibility to invasive fungal disease?',pts:2,
+    cl:'B — Explanation 2 is correct — corticosteroids suppress macrophage phagocytic activity, neutrophil recruitment, and T cell responses, removing primary cellular defenses',
+    exp:'Option A is biologically implausible — while corticosteroids are steroid molecules, fungi do not possess mammalian-type steroid hormone receptors, and ergosterol-associated binding that would upregulate hyphal growth genes has no established basis. Option C incorrectly combines both mechanisms as simultaneously correct when Explanation 1 is biologically unsupported. Option D incorrectly attributes the effect exclusively to mucus changes — while corticosteroids can affect mucus, the primary mechanism of increased fungal susceptibility is cellular immunosuppression. The established mechanism is broad suppression of the cellular immune responses that are the primary defense against fungal infection.'},
+  q13:{text:'Q13. Is the student correct that granuloma formation represents a complete immune victory preventing both current infection and future reactivation?',pts:2,
+    cl:'C — Incorrect — the granuloma contains but does not sterilize; metabolically reduced viable fungal cells can persist and reactivate if immunity is subsequently compromised',
+    exp:'Option A incorrectly claims sterilization occurs within days — the hypoxic, nutrient-poor granuloma interior does not support rapid fungal killing, and sterilization is not guaranteed. Option B introduces a fictional inflammatory secondary response from cellular debris without viable organisms — this does not accurately describe granuloma biology. Option D incorrectly characterizes granuloma formation as immune failure — it is in fact an important secondary containment strategy when primary clearance fails, and the vast majority of immunocompetent hosts with granulomatous fungal containment do not progress to active disease unless immunity is later compromised.'},
+  q14:{text:'Q14. Which position on mycotoxin production in the host context is better supported — net maladaptive or net beneficial?',pts:2,
+    cl:'C — The alternative view is better supported — mycotoxins inhibit macrophage and neutrophil function, create nutrient-rich necrotic space, and disrupt tight junctions, providing net advantages',
+    exp:'Option A incorrectly claims mycotoxins cause a stronger immune response that shortens survival — while toxin-triggered inflammation does occur, the net balance of macrophage inhibition, tissue degradation, and barrier disruption favors the organism. Option B partially identifies a real mechanism (lymphocyte suppression by gliotoxin) but incorrectly frames this as the primary benefit while dismissing innate immune effects. Option D incorrectly states that mycotoxin-producing strains show shorter survival than non-producing mutants — the experimental literature generally shows the opposite, with toxin-producing strains having greater virulence in immunocompromised models.'},
+  q15:{text:'Q15. Is the colleague correct that a shared high-dose exposure produces equivalent disease outcomes across all exposed individuals regardless of immune variation?',pts:1,
+    cl:'False — outcome is primarily determined by host immune competence; immunocompetent individuals will clear spores before germination despite identical high-dose exposure',
+    exp:'Option A (True) incorrectly invokes a dose-override principle that does not apply to fungal infections. Unlike some pathogens where high enough dose can overcome even competent immune systems, the evidence for invasive mold infection strongly supports host immune status as the primary determinant of outcome. The clinical epidemiology of invasive aspergillosis is almost exclusively a disease of immunocompromised patients despite widespread environmental spore exposure in the general population — a pattern that would not exist if high dose could override immune competence.'},
+  q16:{text:'Q16. Which interpretation better explains the absence of secondary cases — low virulence or transmission biology?',pts:2,
+    cl:'B — The alternative interpretation is better supported — the absence of secondary cases reflects that this pathogen requires environmental conidia inhalation and is not transmitted person-to-person',
+    exp:'Option A incorrectly uses secondary attack rate as a virulence measure — secondary attack rate measures transmissibility, not virulence. A highly virulent but environmentally transmitted pathogen would produce zero secondary cases in household contacts not exposed to the environmental source. Option C introduces pre-existing immunity in household contacts as the primary explanation — while prior fungal exposure is common, this is not the parsimonious explanation when the organism\'s transmission biology already accounts for the observation. Option D incorrectly suggests epidemiological data cannot distinguish between virulence and transmissibility — the absence of any secondary cases despite documented close contact strongly implicates transmission biology.'},
+  q17:{text:'Q17. Which assessment of the three proposed vascular dissemination mechanisms is most accurate?',pts:2,
+    cl:'D — Mechanism 2 (protease-mediated ECM degradation) is well established; Mechanism 3 (transcytosis) has experimental support; Mechanism 1 (turgor pressure puncture) overstates hyphal mechanical force',
+    exp:'Option A incorrectly elevates turgor pressure as the primary established mechanism — while hyphal tip pressure is real, it is not documented to be sufficient to rupture intact capillary walls and is not the established primary mechanism. Option B incorrectly claims transcytosis is the exclusive mechanism and dismisses proteases — experimental evidence supports both proteolytic and transcytotic routes. Option C incorrectly claims proteases cannot diffuse to the basement membrane — secreted proteases do reach and degrade basement membrane components as documented in multiple invasion model systems. The current understanding supports protease-mediated degradation as primary with transcytosis as a secondary mechanism.'},
+  q18:{text:'Q18. Is the pharmacologist correct that host immune status should not be incorporated into the definition of infectious dose?',pts:1,
+    cl:'False — the pharmacologist misunderstands infectious dose as an interaction property between pathogen and host; host defense capacity is a legitimate determinant of infection outcome',
+    exp:'Option A (True) accepts a reductionist position that treats infectious dose as a pathogen-intrinsic property independent of host biology — this fundamentally misrepresents how infectious dose works. The concept was always understood to reflect the minimum inoculum required to cause infection under specified conditions, which inherently includes host immune status as a specified condition. Defining infectious dose only in standardized immunocompetent models is a useful experimental convention, not a claim that host immune variation is irrelevant to real-world infection outcomes. The pharmacologist\'s argument would lead to the absurd conclusion that immunocompromised patients face the same infectious dose thresholds as immunocompetent ones.'},
+  q19:{text:'Q19. Is the colleague correct that all four macroscopic features are equally informative for genus-level identification?',pts:1,
+    cl:'C — Incorrect — colony surface pigmentation, texture, and morphology are substantially more genus-informative than growth rate, weight, or pH',
+    exp:'Option A accepts the claim uncritically. Option B elevates colony weight as the most informative feature — biomass production is highly variable depending on media, temperature, and incubation time and is not a reliable genus-level discriminator. Option D elevates pH change — while some fungi do alter medium pH through metabolic activity, this is neither specific enough nor reliable enough to serve as a primary genus-level identifier. The correct answer identifies morphological features as the primary genus-level discriminators because they directly reflect the biological structures (conidial pigments, hyphal organization, sporulation architecture) that are taxonomically defined genus characteristics.'},
+  q20:{text:'Q20. Which genus does the conidiophore-vesicle-phialide-conidia architecture describe, and what rules out the other three genera?',pts:2,
+    cl:'C — Aspergillus — Candida lacks true hyphae and conidiophores, Mucor produces aseptate hyphae and sporangia, and Cryptococcus is an encapsulated yeast with no hyphal growth',
+    exp:'Option A incorrectly describes Candida as sharing vesicle-bearing conidiophore architecture — Candida produces pseudohyphae and budding yeast, not true conidiophores. Option B incorrectly states Mucor has septate hyphae — Mucorales are specifically characterized by aseptate (coenocytic) hyphae, and they produce sporangia not phialide-borne conidia chains. Option D incorrectly describes Cryptococcus as producing chains of cells from specialized structures — Cryptococcus produces encapsulated yeast cells that reproduce by budding, with no conidiophore, vesicle, or hyphal network on standard media. The Aspergillus conidiophore architecture — described as resembling a holy water sprinkler (aspergillum) — is the genus-defining feature.'},
+  q21:{text:'Q21. Is the graduate student correct that Koch\'s Postulates should be applied unmodified and that modifications represent unsound departures from scientific rigor?',pts:2,
+    cl:'False — the student fails on two grounds: the host-dependence of fungal pathogenicity violates the third postulate through biology not methodology, and ethical impossibility requires modified approaches',
+    exp:'Option A (True) accepts the claim by attributing limitations to methodology rather than biology — but the failure of Koch\'s third postulate for fungi is not a methodological problem solvable by better animal models. The same organism genuinely does not cause disease in every healthy host into which it is introduced, which is a biological reality about opportunistic pathogenesis rather than a technical limitation. The graduate student also misrepresents the history — Koch\'s Postulates were recognized as incomplete even for bacteria by Koch himself, and molecular and immunological extensions are not departures from rigor but necessary adaptations to organisms whose pathogenicity is context-dependent.'}
+};
+
+function updateStatus(){
+  var pct=score>0?(score/30):0;
+  var state,label,text,color;
+  if(pct>=0.75){state='contained';label='Contained';text='Host defenses are limiting your establishment. Your hyphal growth is being disrupted and cleared.';color='#85B7EB';}
+  else if(pct>=0.45){state='established';label='Established';text='You have gained a foothold. Host defenses and your biology are in active competition.';color='#FAC775';}
+  else{state='thriving';label='Thriving';text='You are winning. Hyphal invasion is progressing with limited immune resistance.';color='#f09595';}
+  document.getElementById('status-orb').className='status-orb '+state;
+  document.getElementById('status-label').className='status-label '+state;
+  document.getElementById('status-label').textContent=label;
+  document.getElementById('status-text').textContent=text;
+  document.getElementById('status-pts').className='status-pts '+state;
+  document.getElementById('status-pts').textContent=score+' / 30 pts';
+}
+
+function selectMC(btn,qid,letter,isCorrect){
+  if(mcLocked[qid])return;
+  mcLocked[qid]=true;
+  btn.parentElement.querySelectorAll('.option-btn:not(.multi)').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:btn.textContent.trim().substring(0,80),correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    btn.parentElement.querySelectorAll('.option-btn:not(.multi)').forEach(function(b){if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf(',true)')!==-1)b.classList.add('correct');});
+    alog[qid]={sel:btn.textContent.trim().substring(0,80),correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  updateStatus();
+  checkPhaseComplete();
+}
+
+function selectTF(btn,qid,label,isCorrect){
+  if(tfLocked[qid])return;
+  tfLocked[qid]=true;
+  btn.parentElement.querySelectorAll('.tf-btn').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fb-'+qid);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.className='feedback show-correct';
+    fb.textContent='Correct. '+qdefs[qid].exp;
+    score+=qdefs[qid].pts;
+    alog[qid]={sel:label,correct:true,pts:qdefs[qid].pts,max:qdefs[qid].pts};
+  } else {
+    btn.classList.add('incorrect');
+    fb.className='feedback show-incorrect';
+    fb.textContent='Not quite. '+qdefs[qid].exp;
+    btn.parentElement.querySelectorAll('.tf-btn').forEach(function(b){if(b!==btn)b.classList.add('correct');});
+    alog[qid]={sel:label,correct:false,pts:0,max:qdefs[qid].pts};
+  }
+  updateStatus();
+  checkPhaseComplete();
+}
+
+function toggleMA(btn,qid){
+  if(maLocked[qid])return;
+  btn.classList.toggle('multi-selected');
+}
+
+function checkMA(qid,correctArr){
+  if(maLocked[qid])return;
+  maLocked[qid]=true;
+  var block=document.getElementById('fb-'+qid).parentElement;
+  var selected=[];
+  block.querySelectorAll('.option-btn.multi').forEach(function(b){
+    b.disabled=true;
+    var letter=b.getAttribute('data-letter');
+    var was=b.classList.contains('multi-selected');
+    if(was)selected.push(letter);
+    b.classList.remove('multi-selected');
+    if(correctArr.indexOf(letter)!==-1)b.classList.add('correct');
+    else if(was)b.classList.add('incorrect');
+  });
+  var isCorrect=JSON.stringify(selected.slice().sort())===JSON.stringify(correctArr.slice().sort());
+  var fb=document.getElementById('fb-'+qid);
+  fb.className=isCorrect?'feedback show-correct':'feedback show-partial';
+  fb.textContent=(isCorrect?'Correct. ':'Not quite. ')+qdefs[qid].exp;
+  if(isCorrect)score+=qdefs[qid].pts;
+  alog[qid]={sel:selected.length>0?selected.join(', '):'None',correct:isCorrect,pts:isCorrect?qdefs[qid].pts:0,max:qdefs[qid].pts};
+  updateStatus();
+  checkPhaseComplete();
+}
+
+function checkPhaseComplete(){
+  var qs=phaseQ[currentPhase]||[];
+  var done=qs.every(function(qid){return alog[qid]!==undefined;});
+  if(done){
+    var ids={0:'nav-p1',1:'nav-p2',2:'nav-p3',3:'nav-p5',4:'nav-p6',5:'nav-summary'};
+    var el=document.getElementById(ids[currentPhase]);
+    if(el)el.style.display='inline-block';
+  }
+}
+
+function goPhase(n){
+  var phaseIds=['phase-0','phase-1','phase-2','phase-sandstorm','phase-3','phase-4','phase-5','phase-summary'];
+  var progMap=[0,1,2,3,3,4,5,6];
+  phaseIds.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById(phaseIds[n]).classList.add('active');
+  if(n===3){
+    document.getElementById('status-orb').className='status-orb established';
+    document.getElementById('status-label').className='status-label established';
+    document.getElementById('status-label').textContent='Established';
+    document.getElementById('status-text').textContent='The sandstorm has dispersed you across the camp. All previous containment has been reset. Twenty-three people are now potentially exposed.';
+    document.getElementById('status-pts').className='status-pts established';
+  }
+  var prog=progMap[n];
+  if(n>3)currentPhase=n-1;
+  else currentPhase=n;
+  document.querySelectorAll('.prog-seg').forEach(function(s,i){
+    s.classList.remove('done','active');
+    if(i<prog)s.classList.add('done');
+    if(i===prog)s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function buildSummary(){
+  var qids=['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18','q19','q20','q21'];
+  var html='';
+  var sections=[
+    {title:'Phase 1 — The Sealed World',qs:['q1','q2','q3','q4','q5']},
+    {title:'Phase 2 — The Breach',qs:['q6','q7','q8']},
+    {title:'Phase 3 — Entry',qs:['q9','q10','q11']},
+    {title:'Phase 4 — The Immune War',qs:['q12','q13','q14','q15']},
+    {title:'Phase 5 — Spread or Containment',qs:['q16','q17','q18']},
+    {title:'Phase 6 — Identification',qs:['q19','q20','q21']}
+  ];
+  sections.forEach(function(sec){
+    html+='<div style="font-family:Arial,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:rgba(201,168,76,.5);border-bottom:1px solid #2a2310;padding-bottom:6px;margin-bottom:1rem;margin-top:1.5rem;">'+sec.title+'</div>';
+    sec.qs.forEach(function(qid){
+      var def=qdefs[qid];
+      var log=alog[qid];
+      var bc=log?(log.correct?'correct':'incorrect'):'partial';
+      var sc=log?(log.correct?'c':'i'):'p';
+      var st=log?(log.correct?'&#10003; Correct':'&#10007; Incorrect'):'&#8212; Not answered';
+      var ptsStr=log?(log.correct?('+'+log.max+' / '+log.max+' pts'):('0 / '+log.max+' pts')):'0 / '+def.pts+' pts';
+      var ptsCls=log&&log.correct?'style="color:#5DCAA5;"':'style="color:#f09595;"';
+      html+='<div class="sq-block '+bc+'"><div class="sq-status '+sc+'">'+st+' <span class="sq-pts" '+ptsCls+'>'+ptsStr+'</span></div>';
+      html+='<div class="sq-question">'+def.text+'</div>';
+      if(log)html+='<div class="sq-answer"><strong>Your answer:</strong> '+(log.sel||'—')+'</div>';
+      if(!log||!log.correct){
+        html+='<div class="sq-answer sq-correct-ans"><strong>Correct answer:</strong> '+def.cl+'</div>';
+        html+='<div class="sq-expl">'+def.exp+'</div>';
+      }
+      html+='</div>';
+    });
+  });
+  document.getElementById('summary-questions').innerHTML=html;
+
+  var finalScore=Math.max(0,Math.min(30,score));
+  var pct=Math.round((finalScore/30)*100);
+  var sel=document.getElementById('score-display');
+  sel.textContent=finalScore;
+  sel.className='score-big '+(pct>=70?'pass':'fail');
+  document.getElementById('score-pct-display').textContent=pct+'%';
+
+  var state,stateLabel,narrative;
+  if(pct>=75){
+    state='contained';stateLabel='Contained';
+    narrative='You established briefly in one host\'s respiratory tract. The mucociliary escalator and alveolar macrophages cleared the majority of your spores within days. The sandstorm gave you a population-wide opportunity you could not fully exploit — twenty-two of twenty-three exposed hosts cleared you without disease. In the immunocompromised host you achieved pulmonary colonization but granuloma formation contained the hyphal growth before systemic dissemination could occur. You were identified, treated, and eliminated. After three thousand years of patience, this was not your moment. The tomb has been sealed again. You will not get another.';
+  } else if(pct>=45){
+    state='established';stateLabel='Established';
+    narrative='You caused significant pulmonary disease in two hosts — the immunocompromised archaeologist, where you achieved limited systemic spread, and one additional camp member whose innate defenses were insufficient to clear the post-sandstorm exposure. You were identified and antifungal treatment was initiated, though the delay allowed you to establish more broadly than a rapid diagnosis would have permitted. The remaining twenty-one exposed individuals cleared you without disease. You were eventually contained — but not before leaving a biological record in the lungs and medical charts of the people who disturbed your world.';
+  } else {
+    state='thriving';stateLabel='Thriving';
+    narrative='The sandstorm was your inflection point and your biology proved equal to the opportunity. You achieved systemic dissemination in the immunocompromised host, established invasive pulmonary disease in three additional immunocompetent hosts whose defenses were overwhelmed by the post-sandstorm dose, and created an outbreak that required evacuation of the excavation site and hospitalization of four individuals. Identification was delayed. Treatment was initiated late. For an organism that measures time in millennia, four weeks of systemic infection in living hosts and three thousand new spores deposited in the environment around the site represents an extraordinary expansion of your biological reach. You will be in the literature. You will be in the case files. And somewhere in the desert soil around that tomb, descendants of your spores are waiting for the next door to open.';
+  }
+
+  document.getElementById('final-orb').className='status-orb '+state;
+  document.getElementById('final-status-label').textContent=stateLabel;
+  document.getElementById('outcome-text').textContent=narrative;
+  document.getElementById('summary-date-display').textContent='Completed: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  var phaseIds=['phase-0','phase-1','phase-2','phase-sandstorm','phase-3','phase-4','phase-5'];
+  phaseIds.forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('phase-summary').classList.add('active');
+  document.querySelectorAll('.prog-seg').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
+  window.scrollTo(0,0);
+}
+
+function updateName(val){document.getElementById('summary-name-display').textContent=val.trim()||'—';}
+
+document.querySelectorAll('.nav-btn.primary[id^="nav-p"]').forEach(function(btn){btn.style.display='none';});
+document.getElementById('nav-summary').style.display='none';
+updateStatus();
+</script>
+</body>
+</html>
